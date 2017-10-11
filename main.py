@@ -18,10 +18,22 @@ def readConfig():
     return nodes
 
 
-def collect_tweet():
+def collect_tweet(site):
     tweet_text = input("Enter your tweet:")
-    return tweet_text
+    return event(site,"tweet",tweet_text)
 
+def collect_block(site,blocker,blocked):
+    blocked_text = input("Enter your block:")
+    return event(site,"block",blocked_text)
+
+def collect_unblock(site,blocker,blocked):
+    unblocked_text = input("Enter your unblock:")
+    return event(site,"unblock",unblocked_text)
+
+def pretty_print_tweets(list_tweets):
+    string = ""
+    #pretty print
+    return string
 
 def main():
     own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
@@ -30,20 +42,38 @@ def main():
 
     nodes = readConfig()
 
-    this_site = Site(Communicator(nodes,own_binding))
-    this_site.start()
+    communicator = Communicator(nodes,own_binding)
+    communicator.start()
+
+    Log.start()
 
     user_option=""
     while user_option != "quit":
         user_option = input("Select an option: ")
+
         if user_option == "tweet":
             new_tweet = collect_tweet()
-            this_site.tweet(new_tweet)
-        elif user_option == "quit":
-            this_site.stop()
+            Log.tweet(new_tweet)
+            communicator.tweet()
+
+        elif user_option =="view":
+            list_tweets = Log.view()
+
+
+
+        elif user_option =="block":
+            new_block = collect_block()
+            Log.block(new_block)
+
+        elif user_option =="unblock":
+            new_unblock = collect_unblock()
+            Log.unblock(new_unblock)
+
         else:
             print("Invalid operation.")
 
+    communicator.stop()
+    Log.stop()
 
 
 

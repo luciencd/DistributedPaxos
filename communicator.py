@@ -103,3 +103,13 @@ class Communicator:
         self.listener.close()
 
         return True
+
+    #def send_message():
+    def tweet():
+        #get users that are not blocked by this site.
+        #for each user, get data from Log and T that correspond to what those users don't know.
+            #get T from log
+            #get NP from get_events_to_sent_to_j(j)
+            #msg = create the send message data (JSON) as (T,NP)
+            #call channel.send_msg(msg)
+            #
