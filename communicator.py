@@ -16,7 +16,6 @@ class Communicator:
         #create a placeholder array of our communication channels to other sites
         #this will be populated by open_connections() and listener.accept()
         self.channels = [None for _ in self.nodes]
-        self.listener = None
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
 
@@ -42,7 +41,11 @@ class Communicator:
             if channel != None:
                 channel.stop()
 
-        self.listener.close()
+        #open a connection to the listener so that .accept() returns
+        listener_flush = self.make_socket()
+        listener_flush.connect(('127.0.0.1', self.nodes[self.id][1]))
+        listener_flush.close()
+
         self.listener_thread.join()
     '''
     function: make_socket
@@ -72,7 +75,7 @@ class Communicator:
                     self.channels[i] = Channel(i, new_socket)
                     self.channels[i].start(True)
                 except OSError as e:
-                    if e.errno != 10061:
+                    if e.errno != 10061 and e.errno != 111:
                         raise e
 
     '''
@@ -82,24 +85,30 @@ class Communicator:
     def message_listener(self):
         #start by fetching our own binding from the loaded config, to get our port
         binding = self.nodes[self.id]
-        self.listener = self.make_socket()
+        listener = self.make_socket()
         #prepare the socket for listening
-        self.listener.bind(('0.0.0.0', binding[1]))
-        self.listener.listen(len(self.nodes))
+        listener.bind(('0.0.0.0', binding[1]))
+        listener.listen(len(self.nodes))
         self.open_connections()
 
         while False == self.begin_shutdown:
             try:
-                new_sock, new_addr = self.listener.accept()
-                n = int(new_sock.recv(4096).decode().strip())
-                if self.channels[n] != None:
-                    self.channels[n].close()
-                self.channels[n] = Channel(n, new_sock)
-                self.channels[n].start()
+                new_sock, new_addr = listener.accept()
+                n = new_sock.recv(4096).decode().strip()
+                if n.isdigit():
+                    n = int(n);
+                    if self.channels[n] != None:
+                        self.channels[n].close()
+                    self.channels[n] = Channel(n, new_sock)
+                    self.channels[n].start()
+                else:
+                    #socket did not communicate properly, either we're in shutdown
+                    #or someone doesn't know our protocol...
+                    new_sock.close()
             except OSError as e:
                 if e.errno != 10038 or not self.begin_shutdown:
                     raise e
 
-        self.listener.close()
+        listener.close()
 
         return True
