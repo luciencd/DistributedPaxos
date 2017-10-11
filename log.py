@@ -1,4 +1,3 @@
+#interacts with MYSQL
 class Log:
-    def __init__(self):
-        self.events = []
-        
+    def add()
