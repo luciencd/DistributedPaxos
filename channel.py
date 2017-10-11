@@ -1,4 +1,4 @@
-
+import sys
 import threading
 import socket
 
@@ -19,6 +19,7 @@ class Channel:
 
     def stop(self):
         if self.socket != None:
+           self.socket.shutdown(socket.SHUT_RDWR)
            self.socket.close()
            self.socket = None
         if self.thread != None:
