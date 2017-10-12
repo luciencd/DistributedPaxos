@@ -31,6 +31,14 @@ class event:
         else:
             return None
 
+    def related_unblock_exists(self, event_list):
+        linked_unblocks = list(filter(lambda e: e.site == self.site \
+            and e.data == self.data \
+            and e.op == EventTypes.UNBLOCK \
+            and self.op == EventTypes.BLOCK, event_list))
+
+        return len(linked_unblocks) > 0
+
 
     def __str__(self):
         return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,self.timestamp,self.data)

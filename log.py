@@ -1,5 +1,5 @@
 import sqlite3
-from event import event
+from event import event, EventTypes
 from math import sqrt
 import sys
 
@@ -76,17 +76,35 @@ class Log:
         {"sender": sender, "me": Log.id})
         cur.execute("DROP TABLE T_REMOTE")
 
-        log_updates = [str((x["site"], x["op"], x["data"], x["timestamp"])) for x in message.events]
-        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp) VALUES " + (",".join(log_updates)))
-        #TODO: dictionary
+        log_updates = [str((e.site, e.op, e.data, e.timestamp)) for e in message.events]
+        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp) VALUES" + (",".join(log_updates)))
+
+        dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
+                                  and not e.related_unblock_exists(message.events),
+                                  message.events))
+
+        if len(dict_new_blocks) > 0:
+            dict_block_values = [str((e.get_blocker(), e.get_blocked())) for e in dict_new_blocks]
+            cur.execute("INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES" + ",".join(dict_block_values))
+
+        dict_new_unblocks = list(filter(lambda e: e.op == EventTypes.UNBLOCK, message.events))
+        unblock_statement = "DELETE FROM Blocks where blocker = :blocker and blocked = :blocked"
+        for e in dict_new_unblocks:
+            cur.execute(unblock_statement, {"blocker": e.get_blocker(), "blocked": e.get_blocked()})
+
         cnx.commit()
         cnx.close()
+
+    @staticmethod
+    def trim_old_blocks():
+        raise NotImplementedError
+
 
     @staticmethod
     def block(event):
         cnx = sqlite3.connect(Log.DATABASE_FILE)
         Log._do_local_event(cnx, event)
-        Log.__dict_add(event)
+        Log.__dict_add(cnx, event)
         cnx.commit()
         cnx.close()
 
