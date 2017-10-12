@@ -1,7 +1,7 @@
 import sys
 from distributed_site import Site
 from communicator import Communicator
-import log
+from log import Log
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923
