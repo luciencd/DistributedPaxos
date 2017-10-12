@@ -114,7 +114,7 @@ class Communicator:
         return True
 
     #def send_message():
-    def tweet():
+    def tweet(self):
         #get users that are not blocked by this site.
         #for each user, get data from Log and T that correspond to what those users don't know.
             #get T from log
