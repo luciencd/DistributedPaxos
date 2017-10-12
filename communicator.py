@@ -116,7 +116,6 @@ class Communicator:
 
         return True
 
-    #def send_message():
     def tweet(self):
         my_clock = Log.get_clock();
         for site in range(0,len(self.nodes),1):
