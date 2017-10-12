@@ -1,153 +1,196 @@
-#interacts with MYSQL
-import mysql.connector
+import sqlite3
+from event import event, EventTypes
+from math import sqrt
+import sys
 
 class Log:
-    @staticmethod
-    def __init__():
-        #create MYSQL instance.
+    DATABASE_FILE = "database.db"
 
-        #MAKE SURE TO CHECK IF DATABASE ALREADY EXISTS IF python crashed!
-        self.DB_NAME = "WuuBernstein"
-        self.USER = "root"
-        self.TABLES = {}
-        self.TABLES["Log"] = (
-            "CREATE TABLE `Log` ("
+    tables = {
+        "Log": (
+            "CREATE TABLE IF NOT EXISTS `Log` ("
             "`timestamp` INT NOT NULL,"
             "`site` INT NOT NULL,"
-            "`op` VARCHAR NOT NULL,"
+            "`op` VARCHAR(16) NOT NULL,"
             "`data` VARCHAR(144) NOT NULL,"
             "PRIMARY KEY (timestamp, site)"
-        ") ENGINE=InnoDB")
-
-        self.TABLES["Blocks"] = (
-            "CREATE TABLE `Blocks` ("
+        ")"),
+        "Blocks": (
+            "CREATE TABLE IF NOT EXISTS `Blocks` ("
             "`blocker` INT NOT NULL,"
             "`blocked` INT NOT NULL,"
-            "UNIQUE KEY `blocker` (`blocker`,`blocked`)
             "PRIMARY KEY (blocker,blocked)"
-        ") ENGINE=InnoDB")
-
-        self.TABLES["T"] = (
-            "CREATE TABLE `T`("
-            "`site_id_row` INT NOT NULL,"
-            "`site_id_column` INT NOT NULL,"
+        ")"),
+        "T": (
+            "CREATE TABLE IF NOT EXISTS `T`("
+            "`site` INT NOT NULL,"
+            "`knows_about` INT NOT NULL,"
             "`timestamp` INT NOT NULL,"
-            "PRIMARY KEY (site_id_row,site_id_column)"
-        ") ENGINE=InnoDB")
+            "PRIMARY KEY (site,knows_about)"
+        ")")
+    }
 
-        self.cnx = mysql.connector.connect(user=self.USER, database=self.DB_NAME)
+    id = -1
 
+    @staticmethod
+    def start(nodes_count, id):
+        Log.id = id
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        cur = cnx.cursor()
+        for _,create_statement in Log.tables.items():
+            cur.execute(create_statement)
 
+        Log.__initialize_T(cnx, nodes_count)
+        cnx.commit()
+        cnx.close()
         return True
 
-    def initialize_T(nodes_count):
-        self.start_transaction()
+    @staticmethod
+    def stop():
+        pass
+        #Log.cnx.close()
 
-        query = ""
-        #don't need parametrisation because i and j are not inputs.
-        for i in range(nodes_count):
-            for j in range(nodes_count):
-                single_query = "INSERT (site_id_row,site_id_column,timestamp) VALUES ("+i+","+j+",0)"
-                query += single_query
+    @staticmethod
+    def __initialize_T(cnx, nodes_count):
+        all_values = ["("+str(i)+","+str(j)+",0)"
+           for i in range(0,nodes_count,1)
+              for j in range(0,nodes_count,1)]
+        query = "INSERT OR IGNORE into T (site,knows_about,timestamp) VALUES" + (",".join(all_values))
 
-        cur = self.cnx.cursor(buffered=True)
+        cur = cnx.cursor()
         results = cur.execute(query)
 
-        self.end_transaction()
+    @staticmethod
+    def receive(message, sender):
+        sys.stdout.flush()
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        cur = cnx.cursor()
+
+        timestamp_updates = [str((x,y,message.clock[x][y]))
+             for x in range(0,len(message.clock),1)
+               for y in range(0,len(message.clock),1)]
+        cur.execute("CREATE TEMP TABLE T_REMOTE (site int, knows_about int, timestamp int)")
+        cur.execute("INSERT INTO T_REMOTE (site,knows_about,timestamp) VALUES" + (",".join(timestamp_updates)))
+        cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = T.site AND T_REMOTE.knows_about = T.knows_about))")
+        cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = :sender AND T_REMOTE.knows_about = T.knows_about)) WHERE T.site = :me",
+        {"sender": sender, "me": Log.id})
+        cur.execute("DROP TABLE T_REMOTE")
+
+        log_updates = [str((e.site, e.op, e.data, e.timestamp)) for e in message.events]
+        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp) VALUES" + (",".join(log_updates)))
+
+        dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
+                                  and not e.related_unblock_exists(message.events),
+                                  message.events))
+
+        if len(dict_new_blocks) > 0:
+            dict_block_values = [str((e.get_blocker(), e.get_blocked())) for e in dict_new_blocks]
+            cur.execute("INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES" + ",".join(dict_block_values))
+
+        dict_new_unblocks = list(filter(lambda e: e.op == EventTypes.UNBLOCK, message.events))
+        unblock_statement = "DELETE FROM Blocks where blocker = :blocker and blocked = :blocked"
+        for e in dict_new_unblocks:
+            cur.execute(unblock_statement, {"blocker": e.get_blocker(), "blocked": e.get_blocked()})
+
+        cnx.commit()
+        cnx.close()
 
     @staticmethod
-    def receive(message):
-        self.start_transaction()
-        raise NotImplementedError
-
-        self.end_transaction()
-
-    @staticmethod
-    def block():
-        self.start_transaction()
-
-        self._doevent(event)
-        self.dict_add(event)
-
-        self.end_transaction()
-
-    @staticmethod
-    def unblock():
-        self.start_transaction()
-
-        self._doevent(event)
-        self.dict_remove(event)
-
-        self.end_transaction()
-
-    @staticmethod
-    def tweet():
-        self.start_transaction()
-
-        self._doevent(event)
-
-        self.end_transaction()
-
-    @staticmethod
-    def _doevent(event):
-        try:
-            self.log_add(event)
-            self.increment_clock()
-        except(e):
-            #if the log isn't added, we can't increment the timestamp, or send() events in channel.py
-            self.fail_transaction()
-            raise EventFailedError
-            ##tell client gui that tweet was failed.
-
-    @staticmethod
-    def dict_add(event):
-        query = "INSERT INTO Blocks (blocker, blocked) VALUES (%s,%s)"
-        cur = self.cnx.cursor(buffered=True)
-        results = cur.execute(query,(event.get_blocker(),event.get_blocked()))
-
-
-    @staticmethod
-    def dict_remove():
-        query = "DELETE FROM Blocks WHERE blocker = %s AND blocked = %s)"
-        cur = self.cnx.cursor(buffered=True)
-        results = cur.execute(query,(event.get_blocker(),event.get_blocked()))
-
-    @staticmethod
-    def log_add(event,cnx):
-        #make sure to check for block unblock pairs!
-        #Pass in current min timestamp of T i column i
-
-        query = "INSERT INTO Log (timestamp,site,op,data) VALUES (%d, %d, %s, %s)"
-        cur = self.cnx.cursor(buffered=True)
-        results = cur.execute(query,(event.timestamp,event.site,event.op,event.data))
-        #results.fetchone()
-
+    def trim_old_blocks():
         raise NotImplementedError
 
 
     @staticmethod
-    def increment_clock(i):
-        #UPDATE site_id_column,site_id_row =
-        query = "UPDATE T SET timestamp = (1+(SELECT timestamp FROM T WHERE site_id_row=%s AND site_id_column=%s)) WHERE site_id_row=%s AND site_id_column=%s"
-        cur = self.cnx.cursor(buffered=True)
-        results = cur.execute(query,(i,i,i,i))
+    def block(event):
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        Log._do_local_event(cnx, event)
+        Log.__dict_add(cnx, event)
+        cnx.commit()
+        cnx.close()
 
 
     @staticmethod
-    def view(site):
+    def unblock(event):
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        Log._do_local_event(cnx, event)
+        Log.__dict_remove(cnx, event)
+        cnx.commit()
+        cnx.close()
+
+
+    @staticmethod
+    def tweet(event):
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        Log._do_local_event(cnx, event)
+        cnx.commit()
+        cnx.close()
+
+
+    @staticmethod
+    def _do_local_event(cnx, event):
+            Log.__increment_clock(cnx)
+            query = """INSERT INTO Log (timestamp, site, op, data) VALUES (
+               (SELECT timestamp from T WHERE site=:id AND knows_about=:id),
+               :id,
+               :op,
+               :body)"""
+
+            cur = cnx.cursor()
+            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data})
+
+
+    @staticmethod
+    def __dict_add(cnx, event):
+        query = "INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES (:blocker,:blocked)"
+        cur = cnx.cursor()
+        results = cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
+
+
+    @staticmethod
+    def __dict_remove(cnx, event):
+        query = "DELETE FROM Blocks WHERE blocker = :blocker AND blocked = :blocked"
+        cur = cnx.cursor()
+        results = cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
+
+
+    @staticmethod
+    def __increment_clock(cnx):
+        query = "UPDATE T SET timestamp = timestamp+1 WHERE site=:me AND knows_about=:me"
+        cur = cnx.cursor()
+        results = cur.execute(query,{"me": Log.id})
+
+    @staticmethod
+    def create_events(result_obj):
+        return [ event(site,op,data,time) for time,site,op,data in result_obj ]
+
+
+    @staticmethod
+    def get_not_hasRecv(site):
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        query = "SELECT Log.* FROM Log JOIN T on T.knows_about = Log.site AND T.site = :target WHERE Log.timestamp > T.timestamp"
+        cur = cnx.cursor()
+        results = cur.execute(query, { "target": site}).fetchall()
+        cnx.close()
+        return Log.create_events(results)
+
+    @staticmethod
+    def get_clock():
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        query = "SELECT timestamp FROM T ORDER BY site,knows_about"
+        cur = cnx.cursor()
+        results = cur.execute(query)
+        ordered_results = results.fetchall()
+        cnx.close()
+        num_sites = int(sqrt(len(ordered_results))) #this should always be a perfect square, because we have a 2d vector clock
+        #since data returned row-first, we can split results to rebuild 2d array
+        return [ ordered_results[start:start+num_sites] for start in range(0,num_sites**2, num_sites)]
+
+    @staticmethod
+    def view():
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
         #SELECT all from the Log table where op=tweet, and where site is not in blocked of where the tweet is coming from.
-        query = "SELECT * FROM Log WHERE Log.op = 'tweet' AND NOT EXISTS(SELECT * FROM Blocks WHERE Log.site = Blocks.blocked AND Blocks.blocked = %s))"
-        #create events
-        return list_events
-
-    @staticmethod
-    def start_transaction():
-        self.cnx.start_transaction()
-
-    @staticmethod
-    def end_transaction():
-        self.cnx.commit()
-
-    @staticmethod
-    def fail_transaction():
-        self.cnx.rollback()
+        query = "SELECT * FROM Log WHERE op = 'tweet' AND NOT EXISTS (SELECT * FROM Blocks WHERE blocker = Log.site AND blocked = :self)"
+        cur = cnx.cursor()
+        results = cur.execute(query, {"self": Log.id}).fetchall()
+        cnx.close()
+        return Log.create_events(results)
