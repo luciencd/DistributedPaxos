@@ -19,10 +19,10 @@ class Log:
         ")"),
         "T": (
             "CREATE TABLE IF NOT EXISTS `T`("
-            "`site_id_row` INT NOT NULL,"
-            "`site_id_column` INT NOT NULL,"
+            "`site` INT NOT NULL,"
+            "`knows_about` INT NOT NULL,"
             "`timestamp` INT NOT NULL,"
-            "PRIMARY KEY (site_id_row,site_id_column)"
+            "PRIMARY KEY (site,knows_about)"
         ")")
     }
 
@@ -50,7 +50,7 @@ class Log:
         all_values = ["("+str(i)+","+str(j)+",0)"
            for i in range(0,nodes_count,1)
               for j in range(0,nodes_count,1)]
-        query = "INSERT OR IGNORE into T (site_id_row,site_id_column,timestamp) VALUES" + (",".join(all_values))
+        query = "INSERT OR IGNORE into T (site,knows_about,timestamp) VALUES" + (",".join(all_values))
 
         cur = Log.cnx.cursor()
         results = cur.execute(query)
@@ -85,7 +85,7 @@ class Log:
     def _do_local_event(event):
             Log.increment_clock()
             query = """INSERT INTO Log (timestamp, site, op, data) VALUES (
-               (SELECT timestamp from T WHERE site_id_row=:id AND site_id_column=:id),
+               (SELECT timestamp from T WHERE site=:id AND knows_about=:id),
                :id,
                :op,
                :body)"""
@@ -111,9 +111,9 @@ class Log:
 
     @staticmethod
     def increment_clock():
-        query = "UPDATE T SET timestamp = timestamp+1 WHERE site_id_row=:row AND site_id_column=:col"
+        query = "UPDATE T SET timestamp = timestamp+1 WHERE site=:me AND knows_about=:me"
         cur = Log.cnx.cursor()
-        results = cur.execute(query,{"row": Log.id, "col": Log.id})
+        results = cur.execute(query,{"me": Log.id})
 
 
     @staticmethod
