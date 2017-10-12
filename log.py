@@ -108,12 +108,22 @@ class Log:
         results = cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
 
 
-
     @staticmethod
     def increment_clock():
         query = "UPDATE T SET timestamp = timestamp+1 WHERE site=:me AND knows_about=:me"
         cur = Log.cnx.cursor()
         results = cur.execute(query,{"me": Log.id})
+
+    @staticmethod
+    def create_events(result_obj):
+        return [ event(site,op,data,time) for time,site,op,data in result_obj.fetchall()]
+
+    @staticmethod
+    def get_not_hasRecv(site):
+        query = "SELECT * FROM Log JOIN T on T.knows_about = Log.site AND T.site = :target WHERE Log.timestamp > T.timestamp"
+        cur = Log.cnx.cursor()
+        results = cur.execute(query, { "target": site})
+        return create_events(results)
 
 
     @staticmethod
@@ -122,5 +132,4 @@ class Log:
         query = "SELECT * FROM Log WHERE op = 'tweet' AND NOT EXISTS (SELECT * FROM Blocks WHERE blocker = Log.site AND blocked = :self)"
         cur = Log.cnx.cursor()
         results = cur.execute(query, {"self": Log.id})
-        results_as_events = [ event(site,op,data,time) for time,site,op,data in results.fetchall()]
-        return results_as_events
+        return create_events(results)
