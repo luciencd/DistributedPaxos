@@ -29,7 +29,13 @@ class Channel:
 
     def send_msg(self, msg):
         delimited_message = str(msg) + Channel.DELIM
-        self.socket.send(delimited_message.encode())
+        try:
+            if self.socket != None:
+                self.socket.send(delimited_message.encode())
+        except e:
+            #writing on the pipe failed, there was probably a crash...
+            #kill the thread so we can regen it when they come back
+            self.stop()
 
     def channel_thread(self):
         message = "init"
