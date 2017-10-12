@@ -1,8 +1,11 @@
 import sqlite3
 from event import event
 from math import sqrt
+import sys
 
 class Log:
+    DATABASE_FILE = "database.db"
+
     tables = {
         "Log": (
             "CREATE TABLE IF NOT EXISTS `Log` ("
@@ -27,134 +30,149 @@ class Log:
         ")")
     }
 
-    cnx = None
     id = -1
 
     @staticmethod
     def start(nodes_count, id):
         Log.id = id
-        Log.cnx = sqlite3.connect("database.db")
-        cur = Log.cnx.cursor()
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        cur = cnx.cursor()
         for _,create_statement in Log.tables.items():
             cur.execute(create_statement)
 
-        Log.initialize_T(nodes_count)
+        Log.__initialize_T(cnx, nodes_count)
+        cnx.commit()
+        cnx.close()
         return True
 
     @staticmethod
     def stop():
-        Log.cnx.commit()
-        Log.cnx.close()
+        pass
+        #Log.cnx.close()
 
     @staticmethod
-    def initialize_T(nodes_count):
+    def __initialize_T(cnx, nodes_count):
         all_values = ["("+str(i)+","+str(j)+",0)"
            for i in range(0,nodes_count,1)
               for j in range(0,nodes_count,1)]
         query = "INSERT OR IGNORE into T (site,knows_about,timestamp) VALUES" + (",".join(all_values))
 
-        cur = Log.cnx.cursor()
+        cur = cnx.cursor()
         results = cur.execute(query)
-        Log.cnx.commit()
 
     @staticmethod
     def receive(message, sender):
-        cur = Log.cnx.cursor()
+        sys.stdout.flush()
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        cur = cnx.cursor()
 
         timestamp_updates = [str((x,y,message.clock[x][y]))
              for x in range(0,len(message.clock),1)
                for y in range(0,len(message.clock),1)]
         cur.execute("CREATE TEMP TABLE T_REMOTE (site int, knows_about int, timestamp int)")
-        cur.execute("INSERT INTO T_REMOTE ( site, knows_about, timestamp ) VALUES " + (",".join(timestamp_updates)))
+        cur.execute("INSERT INTO T_REMOTE (site,knows_about,timestamp) VALUES" + (",".join(timestamp_updates)))
         cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = T.site AND T_REMOTE.knows_about = T.knows_about))")
-        cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_remote.site = :sender AND T_REMOTE.knows_about = T.knows_about)) WHERE T.site = :me",
+        cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = :sender AND T_REMOTE.knows_about = T.knows_about)) WHERE T.site = :me",
         {"sender": sender, "me": Log.id})
         cur.execute("DROP TABLE T_REMOTE")
 
         log_updates = [str((x["site"], x["op"], x["data"], x["timestamp"])) for x in message.events]
         cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp) VALUES " + (",".join(log_updates)))
         #TODO: dictionary
-        Log.cnx.commit()
+        cnx.commit()
+        cnx.close()
 
     @staticmethod
     def block(event):
-        Log._do_local_event(event)
-        Log.dict_add(event)
-        Log.cnx.commit()
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        Log._do_local_event(cnx, event)
+        Log.__dict_add(event)
+        cnx.commit()
+        cnx.close()
 
 
     @staticmethod
     def unblock(event):
-        Log._do_local_event(event)
-        Log.dict_remove(event)
-        Log.cnx.commit()
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        Log._do_local_event(cnx, event)
+        Log.__dict_remove(cnx, event)
+        cnx.commit()
+        cnx.close()
 
 
     @staticmethod
     def tweet(event):
-        Log._do_local_event(event)
-        Log.cnx.commit()
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        Log._do_local_event(cnx, event)
+        cnx.commit()
+        cnx.close()
 
 
     @staticmethod
-    def _do_local_event(event):
-            Log.increment_clock()
+    def _do_local_event(cnx, event):
+            Log.__increment_clock(cnx)
             query = """INSERT INTO Log (timestamp, site, op, data) VALUES (
                (SELECT timestamp from T WHERE site=:id AND knows_about=:id),
                :id,
                :op,
                :body)"""
 
-            cur = Log.cnx.cursor()
+            cur = cnx.cursor()
             cur.execute(query, {"id": event.site, "op": event.op, "body": event.data})
 
 
     @staticmethod
-    def dict_add(event):
+    def __dict_add(cnx, event):
         query = "INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES (:blocker,:blocked)"
-        cur = Log.cnx.cursor()
+        cur = cnx.cursor()
         results = cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
 
 
     @staticmethod
-    def dict_remove(event):
+    def __dict_remove(cnx, event):
         query = "DELETE FROM Blocks WHERE blocker = :blocker AND blocked = :blocked"
-        cur = Log.cnx.cursor()
+        cur = cnx.cursor()
         results = cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
 
 
     @staticmethod
-    def increment_clock():
+    def __increment_clock(cnx):
         query = "UPDATE T SET timestamp = timestamp+1 WHERE site=:me AND knows_about=:me"
-        cur = Log.cnx.cursor()
+        cur = cnx.cursor()
         results = cur.execute(query,{"me": Log.id})
 
     @staticmethod
     def create_events(result_obj):
-        return [ event(site,op,data,time) for time,site,op,data in result_obj.fetchall()]
+        return [ event(site,op,data,time) for time,site,op,data in result_obj ]
 
 
     @staticmethod
     def get_not_hasRecv(site):
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
         query = "SELECT Log.* FROM Log JOIN T on T.knows_about = Log.site AND T.site = :target WHERE Log.timestamp > T.timestamp"
-        cur = Log.cnx.cursor()
-        results = cur.execute(query, { "target": site})
+        cur = cnx.cursor()
+        results = cur.execute(query, { "target": site}).fetchall()
+        cnx.close()
         return Log.create_events(results)
 
     @staticmethod
     def get_clock():
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
         query = "SELECT timestamp FROM T ORDER BY site,knows_about"
-        cur = Log.cnx.cursor()
+        cur = cnx.cursor()
         results = cur.execute(query)
         ordered_results = results.fetchall()
+        cnx.close()
         num_sites = int(sqrt(len(ordered_results))) #this should always be a perfect square, because we have a 2d vector clock
         #since data returned row-first, we can split results to rebuild 2d array
         return [ ordered_results[start:start+num_sites] for start in range(0,num_sites**2, num_sites)]
 
     @staticmethod
     def view():
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
         #SELECT all from the Log table where op=tweet, and where site is not in blocked of where the tweet is coming from.
         query = "SELECT * FROM Log WHERE op = 'tweet' AND NOT EXISTS (SELECT * FROM Blocks WHERE blocker = Log.site AND blocked = :self)"
-        cur = Log.cnx.cursor()
-        results = cur.execute(query, {"self": Log.id})
+        cur = cnx.cursor()
+        results = cur.execute(query, {"self": Log.id}).fetchall()
+        cnx.close()
         return Log.create_events(results)

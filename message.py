@@ -13,4 +13,6 @@ class Message:
     def fromJSON(payload):
         new_msg = Message([],[])
         new_msg.__dict__ = json.loads(payload)
+        #json.loads deserializes the object incorrectly
+        new_msg.clock = [[x[0], y[0], z[0]] for x,y,z in new_msg.clock]
         return new_msg

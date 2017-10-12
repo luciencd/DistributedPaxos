@@ -92,10 +92,10 @@ class Communicator:
         #prepare the socket for listening
         listener.bind(('0.0.0.0', binding[1]))
         listener.listen(len(self.nodes))
-        self.open_connections()
 
         while False == self.begin_shutdown:
             try:
+                self.open_connections()
                 new_sock, new_addr = listener.accept()
                 n = new_sock.recv(4096).decode().strip()
                 if n.isdigit():
