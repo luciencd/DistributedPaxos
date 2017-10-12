@@ -20,17 +20,17 @@ def readConfig():
 
 
 def collect_tweet(site):
-    tweet_text = input("Enter your tweet:")
+    tweet_text = input("Enter your tweet: ")
     return event(site, EventTypes.TWEET, tweet_text)
 
 def collect_block(site):
-    blocked_text = input("Enter your block:")
+    blocked_text = input("Enter your block: ")
     if not blocked_text.isdigit():
         return None
     return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text)
 
 def collect_unblock(site):
-    unblocked_text = input("Enter your unblock:")
+    unblocked_text = input("Enter your unblock: ")
     if not unblocked_text.isdigit():
         return None
     return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text)
