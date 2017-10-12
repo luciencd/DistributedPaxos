@@ -14,7 +14,7 @@ class Log:
             "CREATE TABLE `Log` ("
             "`timestamp` INT NOT NULL,"
             "`site` INT NOT NULL,"
-            "`op` VARCHAR NOT NULL,"
+            "`op` VARCHAR(16) NOT NULL,"
             "`data` VARCHAR(144) NOT NULL,"
             "PRIMARY KEY (timestamp, site)"
         ") ENGINE=InnoDB")
