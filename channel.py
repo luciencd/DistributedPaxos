@@ -1,6 +1,8 @@
 import sys
 import threading
 import socket
+from message import Message
+from log import Log
 
 class Channel:
     DELIM = "\n"
@@ -33,9 +35,14 @@ class Channel:
         message = "init"
         while message != "":
             try:
-                message = self.socket.recv(4096).decode().strip()
-                #TODO: might need to split on delim instead of strip()
-                #TODO: signal that a tweet should be recorded... might need to pass a handle to the DB down here
+                message = self.socket.recv(4096).decode()
+                while message != "" and not Channel.DELIM in message:
+                    message = message + self.socket.recv(4096).decode()
+
+                if message != "":
+                    message_converted = Message.fromJSON(message.strip())
+                    Log.receive(message_converted, self.id)
+
             except OSError as e:
                 if e.errno == 10053 or e.errno == 10054:
                     #the socket has been closed, flee this thread

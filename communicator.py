@@ -2,6 +2,9 @@ import itertools
 import threading
 import socket
 from channel import Channel
+from log import Log
+from message import Message
+
 
 class Communicator:
 
@@ -98,7 +101,7 @@ class Communicator:
                 if n.isdigit():
                     n = int(n);
                     if self.channels[n] != None:
-                        self.channels[n].close()
+                        self.channels[n].stop()
                     self.channels[n] = Channel(n, new_sock)
                     self.channels[n].start()
                 else:
@@ -115,10 +118,10 @@ class Communicator:
 
     #def send_message():
     def tweet(self):
-        #get users that are not blocked by this site.
-        #for each user, get data from Log and T that correspond to what those users don't know.
-            #get T from log
-            #get NP from get_events_to_sent_to_j(j)
-            #msg = create the send message data (JSON) as (T,NP)
-            #call channel.send_msg(msg)
+        my_clock = Log.get_clock();
+        for site in range(0,len(self.nodes),1):
+            NP = Log.get_not_hasRecv(site)
+            if len(NP) > 0 and self.channels[site] != None:
+                message = Message(my_clock, NP).toJSON()
+                self.channels[site].send_msg(message)
         return True
