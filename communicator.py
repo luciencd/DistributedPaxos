@@ -121,4 +121,4 @@ class Communicator:
             #get NP from get_events_to_sent_to_j(j)
             #msg = create the send message data (JSON) as (T,NP)
             #call channel.send_msg(msg)
-            #
+        return True

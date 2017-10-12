@@ -1,6 +1,7 @@
 import sys
 from distributed_site import Site
 from communicator import Communicator
+import log
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923
@@ -42,24 +43,22 @@ def main():
 
     nodes = readConfig()
 
-    communicator = Communicator(nodes,own_binding)
-    communicator.start()
+    #communicator = Communicator(nodes,own_binding)
+    #communicator.start()
 
     Log.start()
 
-    user_option=""
+    user_option = ""
     while user_option != "quit":
         user_option = input("Select an option: ")
 
         if user_option == "tweet":
             new_tweet = collect_tweet()
             Log.tweet(new_tweet)
-            communicator.tweet()
+            #communicator.tweet()
 
         elif user_option =="view":
             list_tweets = Log.view()
-
-
 
         elif user_option =="block":
             new_block = collect_block()
