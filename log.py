@@ -6,12 +6,11 @@ class Log:
     def __init__():
         #create MYSQL instance.
 
-        #MAKE SURE TO CHECK IF DATABASE ALREADY EXISTS IF python crashed!
         self.DB_NAME = "WuuBernstein"
         self.USER = "root"
         self.TABLES = {}
         self.TABLES["Log"] = (
-            "CREATE TABLE `Log` ("
+            "CREATE TABLE IF NOT EXISTS `Log` ("
             "`timestamp` INT NOT NULL,"
             "`site` INT NOT NULL,"
             "`op` VARCHAR(16) NOT NULL,"
@@ -20,14 +19,14 @@ class Log:
         ") ENGINE=InnoDB")
 
         self.TABLES["Blocks"] = (
-            "CREATE TABLE `Blocks` ("
+            "CREATE TABLE IF NOT EXISTS `Blocks` ("
             "`blocker` INT NOT NULL,"
             "`blocked` INT NOT NULL,"
             "PRIMARY KEY (blocker,blocked)"
         ") ENGINE=InnoDB")
 
         self.TABLES["T"] = (
-            "CREATE TABLE `T`("
+            "CREATE TABLE IF NOT EXISTS `T`("
             "`site_id_row` INT NOT NULL,"
             "`site_id_column` INT NOT NULL,"
             "`timestamp` INT NOT NULL,"
