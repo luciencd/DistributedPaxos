@@ -23,7 +23,6 @@ class Log:
             "CREATE TABLE `Blocks` ("
             "`blocker` INT NOT NULL,"
             "`blocked` INT NOT NULL,"
-            "UNIQUE KEY `blocker` (`blocker`,`blocked`)
             "PRIMARY KEY (blocker,blocked)"
         ") ENGINE=InnoDB")
 
