@@ -3,7 +3,7 @@ import os
 from communicator import Communicator
 from log import Log
 from event import event, EventTypes
-import datetime
+from datetime import datetime, date
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923

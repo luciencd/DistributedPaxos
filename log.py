@@ -139,7 +139,7 @@ class Log:
                :truetime)"""
 
             cur = cnx.cursor()
-            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data, "truetime":event.time})
+            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data, "truetime":event.truetime})
 
 
     @staticmethod
@@ -164,7 +164,7 @@ class Log:
 
     @staticmethod
     def create_events(result_obj):
-        return [ event(site,op,data,time) for time,site,op,data in result_obj ]
+        return [ event(site,op,data,truetime,time) for time,site,op,data,truetime in result_obj ]
 
 
     @staticmethod
