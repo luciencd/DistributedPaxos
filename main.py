@@ -1,7 +1,9 @@
 import sys
+import os
 from communicator import Communicator
 from log import Log
 from event import event, EventTypes
+
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923

@@ -1,0 +1,2 @@
+python main.py config.txt 9000
+python main.py config.txt 8923
