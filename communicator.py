@@ -78,7 +78,7 @@ class Communicator:
                     self.channels[i] = Channel(i, new_socket)
                     self.channels[i].start(True)
                 except OSError as e:
-                    if e.errno != 10061 and e.errno != 111:
+                    if e.errno != 10061 and e.errno != 111 and e.errno != 61:
                         raise e
 
     '''

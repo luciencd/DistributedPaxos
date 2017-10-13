@@ -10,10 +10,11 @@ class event:
         self.site = site
         self.op = op
         self.data = body
+        ##need to change timestamp to actual time.
         self.timestamp = timestamp
+        #self.specifictime = specifictime
 
     def get_tweet(self):
-        #what if a blocking thingy calls get_tweet()?
         if(self.op == EventTypes.TWEET):
             return self.data
         else:
