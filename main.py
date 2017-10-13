@@ -3,7 +3,7 @@ import os
 from communicator import Communicator
 from log import Log
 from event import event, EventTypes
-
+import datetime
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923
@@ -23,19 +23,19 @@ def readConfig():
 
 def collect_tweet(site):
     tweet_text = input("Enter your tweet: ")
-    return event(site, EventTypes.TWEET, tweet_text)
+    return event(site, EventTypes.TWEET, tweet_text,datetime.now())
 
 def collect_block(site):
     blocked_text = input("Enter your block: ")
     if not blocked_text.isdigit():
         return None
-    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text)
+    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,datetime.now()
 
 def collect_unblock(site):
     unblocked_text = input("Enter your unblock: ")
     if not unblocked_text.isdigit():
         return None
-    return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text)
+    return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,datetime.now())
 
 
 def main():

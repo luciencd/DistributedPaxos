@@ -6,13 +6,13 @@ class EventTypes:
 
 class event:
     DELIM = ","
-    def __init__(self,site,op,body,timestamp=-1):
+    def __init__(self,site,op,body,truetime,timestamp=-1):
         self.site = site
         self.op = op
         self.data = body
         ##need to change timestamp to actual time.
         self.timestamp = timestamp
-        #self.specifictime = specifictime
+        self.truetime = truetime
 
     def get_tweet(self):
         if(self.op == EventTypes.TWEET):
@@ -42,4 +42,4 @@ class event:
 
 
     def __str__(self):
-        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,self.timestamp,self.data)
+        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,self.truetime,self.data)

@@ -13,6 +13,7 @@ class Log:
             "`site` INT NOT NULL,"
             "`op` VARCHAR(16) NOT NULL,"
             "`data` VARCHAR(144) NOT NULL,"
+            "`truetime` DATETIME NOT NULL,"
             "PRIMARY KEY (timestamp, site)"
         ")"),
         "Blocks": (
@@ -35,7 +36,7 @@ class Log:
     @staticmethod
     def start(nodes_count, id):
         Log.id = id
-        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        cnx = sqlite3.connect(Log.DATABASE_FILE,detect_types=sqlite3.PARSE_DECLTYPES)
         cur = cnx.cursor()
         for _,create_statement in Log.tables.items():
             cur.execute(create_statement)
@@ -77,8 +78,8 @@ class Log:
         {"sender": sender, "me": Log.id})
         cur.execute("DROP TABLE T_REMOTE")
 
-        log_updates = [str((e.site, e.op, e.data, e.timestamp)) for e in message.events]
-        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp) VALUES" + (",".join(log_updates)))
+        log_updates = [str((e.site, e.op, e.data, e.timestamp, e.truetime)) for e in message.events]
+        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp, truetime) VALUES" + (",".join(log_updates)))
 
         dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
                                   and not e.related_unblock_exists(message.events),
@@ -130,14 +131,15 @@ class Log:
     @staticmethod
     def _do_local_event(cnx, event):
             Log.__increment_clock(cnx)
-            query = """INSERT INTO Log (timestamp, site, op, data) VALUES (
+            query = """INSERT INTO Log (timestamp, site, op, data, truetime) VALUES (
                (SELECT timestamp from T WHERE site=:id AND knows_about=:id),
                :id,
                :op,
-               :body)"""
+               :body,
+               :truetime)"""
 
             cur = cnx.cursor()
-            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data})
+            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data, "truetime":event.time})
 
 
     @staticmethod
