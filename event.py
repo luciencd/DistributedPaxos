@@ -1,3 +1,5 @@
+from datetime import datetime
+from dateutil import tz
 
 class EventTypes:
     BLOCK="block"
@@ -10,8 +12,8 @@ class event:
         self.site = site
         self.op = op
         self.data = body
-        ##need to change timestamp to actual time.
         self.timestamp = timestamp
+        #when constructing this, assume the tweet's time is in UTC, and should be converted in the __str__ "view"
         self.truetime = truetime
 
     def get_tweet(self):
@@ -42,4 +44,8 @@ class event:
 
 
     def __str__(self):
-        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,self.truetime,self.data)
+        #tbh: this strptime parsing does not look too promising with the explicit removal of the expected utc time...
+        utctime = datetime.strptime(self.truetime[0:-6],'%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=tz.tzutc())
+        localtime = utctime.astimezone(tz.tzlocal())
+        minute_localtime = localtime.strftime('%Y-%m-%d %H:%M:%S')
+        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,minute_localtime,self.data)

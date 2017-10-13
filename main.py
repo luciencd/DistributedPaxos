@@ -4,6 +4,7 @@ from communicator import Communicator
 from log import Log
 from event import event, EventTypes
 from datetime import datetime, date
+from dateutil import tz
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923
@@ -21,21 +22,23 @@ def readConfig():
     return nodes
 
 
-def collect_tweet(site):
+def collect_tweet(site,now_time):
     tweet_text = input("Enter your tweet: ")
-    return event(site, EventTypes.TWEET, tweet_text,datetime.now())
 
-def collect_block(site):
+    #print(now_time.astimezone(tz.tzlocal()))
+    return event(site, EventTypes.TWEET, tweet_text,now_time)
+
+def collect_block(site,now_time):
     blocked_text = input("Enter your block: ")
     if not blocked_text.isdigit():
         return None
-    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,datetime.now())
+    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,now_time)
 
-def collect_unblock(site):
+def collect_unblock(site,now_time):
     unblocked_text = input("Enter your unblock: ")
     if not unblocked_text.isdigit():
         return None
-    return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,datetime.now())
+    return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,now_time)
 
 
 def main():
@@ -53,9 +56,12 @@ def main():
     user_option = ""
     while user_option != "quit":
         user_option = input("Select an option: ")
+        #get current time.
+        now_time = datetime.utcnow()
+        now_time = now_time.replace(tzinfo=tz.tzutc())
 
         if user_option == "tweet":
-            new_tweet = collect_tweet(communicator.id)
+            new_tweet = collect_tweet(communicator.id,now_time)
             Log.tweet(new_tweet)
             communicator.tweet()
 
@@ -65,14 +71,14 @@ def main():
             print(*list_tweets, sep="\n\n", end = "\n\n")
 
         elif user_option =="block":
-            new_block = collect_block(communicator.id)
+            new_block = collect_block(communicator.id,now_time)
             if new_block != None:
                 Log.block(new_block)
             else:
                 print("Invalid block, doing nothing.")
 
         elif user_option =="unblock":
-            new_unblock = collect_unblock(communicator.id)
+            new_unblock = collect_unblock(communicator.id,now_time)
             if new_unblock != None:
                 Log.unblock(new_unblock)
             else:
