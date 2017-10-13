@@ -69,6 +69,7 @@ class Log:
         timestamp_updates = [str((x,y,message.clock[x][y]))
              for x in range(0,len(message.clock),1)
                for y in range(0,len(message.clock),1)]
+
         cur.execute("CREATE TEMP TABLE T_REMOTE (site int, knows_about int, timestamp int)")
         cur.execute("INSERT INTO T_REMOTE (site,knows_about,timestamp) VALUES" + (",".join(timestamp_updates)))
         cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = T.site AND T_REMOTE.knows_about = T.knows_about))")
