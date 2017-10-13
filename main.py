@@ -29,7 +29,7 @@ def collect_block(site):
     blocked_text = input("Enter your block: ")
     if not blocked_text.isdigit():
         return None
-    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,datetime.now()
+    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,datetime.now())
 
 def collect_unblock(site):
     unblocked_text = input("Enter your unblock: ")
@@ -77,7 +77,7 @@ def main():
                 Log.unblock(new_unblock)
             else:
                 print("Invalid unblock, doing nothing.")
-                
+
         elif user_option =="quit":
             print("Shutting down...")
 
