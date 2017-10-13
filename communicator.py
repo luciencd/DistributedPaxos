@@ -16,7 +16,6 @@ class Communicator:
         self.nodes_by_addr = dict(zip(self.nodes, itertools.count()))
         #look ourselves up in the reversed table to find our Site ID
         self.id = self.nodes_by_addr.get(binding_)
-        print("I AM",self.id,flush=True)
         #create a placeholder array of our communication channels to other sites
         #this will be populated by open_connections() and listener.accept()
         self.channels = [None for _ in self.nodes]
@@ -74,16 +73,13 @@ class Communicator:
             new_socket = None
             if (self.channels[i] == None or self.channels[i].closed) and i != self.id:
                 new_socket = self.make_socket()
+                new_socket.settimeout(2)
                 try:
-                    print("CONN TO SITE", i, flush=True)
                     new_socket.connect(self.nodes[i])
-                    print("SITE",i,"CONNECTED",flush=True)
                     self.channels[i] = Channel(i, new_socket)
                     self.channels[i].start(self.id)
                 except OSError as e:
-                    print("FAILED FOR SITE",i,":",e,flush=True)
-
-                    if e.errno != 10061 and e.errno != 111 and e.errno != 61:
+                    if e.errno != 10061 and e.errno != 111 and e.errno != 61 and e.errno != None:
                         raise e
 
     '''
@@ -95,21 +91,16 @@ class Communicator:
         binding = self.nodes[self.id]
         listener = self.make_socket()
         #prepare the socket for listening
-        print("BEFORE BINDING...", flush=True)
         listener.bind(binding)
         listener.listen(len(self.nodes))
 
-        print("AFTER LISTEN...", flush=True)
 
         while False == self.begin_shutdown:
             try:
 
-                print("BEFORE OPEN_CONN...", flush=True)
                 self.open_connections()
 
-                print("BEFORE ACCEPT...", flush=True)
                 new_sock, new_addr = listener.accept()
-                print("AFTER ACCEPT...", flush=True)
                 n = new_sock.recv(4096).decode().strip()
                 if n.isdigit():
                     n = int(n);
