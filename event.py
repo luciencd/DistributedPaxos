@@ -44,8 +44,8 @@ class event:
 
 
     def __str__(self):
-        print(self.truetime)
-        utctime = datetime.strptime(self.truetime,'%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=tz.tzutc())
+        #tbh: this strptime parsing does not look too promising with the explicit removal of the expected utc time...
+        utctime = datetime.strptime(self.truetime[0:-6],'%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=tz.tzutc())
         localtime = utctime.astimezone(tz.tzlocal())
         minute_localtime = localtime.strftime('%Y-%m-%d %H:%M:%S')
         return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,minute_localtime,self.data)
