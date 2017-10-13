@@ -1,5 +1,6 @@
 from datetime import datetime
 from dateutil import tz
+from dateutil.parser import parse
 
 class EventTypes:
     BLOCK="block"
@@ -44,8 +45,5 @@ class event:
 
 
     def __str__(self):
-        #tbh: this strptime parsing does not look too promising with the explicit removal of the expected utc time...
-        utctime = datetime.strptime(self.truetime[0:-6],'%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=tz.tzutc())
-        localtime = utctime.astimezone(tz.tzlocal())
-        minute_localtime = localtime.strftime('%Y-%m-%d %H:%M:%S')
-        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,minute_localtime,self.data)
+        localtime = parse(self.truetime).astimezone(tz.tzlocal())
+        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,localtime.strftime('%Y-%m-%d %H:%M:%S'),self.data)

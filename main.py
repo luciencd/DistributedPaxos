@@ -58,8 +58,8 @@ def main():
         user_option = input("Select an option: ")
         #get current time.
         now_time = datetime.utcnow()
-        now_time = now_time.replace(tzinfo=tz.tzutc())
-
+        now_time = now_time.replace(tzinfo=tz.tzutc()).replace(microsecond=0)
+        #print(now_time.replace(microsecond=0))
         if user_option == "tweet":
             new_tweet = collect_tweet(communicator.id,now_time)
             Log.tweet(new_tweet)
