@@ -11,13 +11,16 @@ class Channel:
         self.id = id_
         self.socket = sock_
         self.thread = None
+        self.closed = False
 
 
-    def start(self, announce=False):
+    def start(self, announce_self=-1):
         self.thread = threading.Thread(target=self.channel_thread)
         self.thread.start();
-        if announce:
-            self.send_msg(str(self.id))
+        if announce_self > 0:
+            #if this is greater than zero, it represents my parent site id, and
+            #I should tell the foreign communicator who I am (because I'm initiating)
+            self.send_msg(str(announce_self))
 
     def stop(self):
         if self.socket != None:
@@ -27,12 +30,14 @@ class Channel:
         if self.thread != None:
             self.thread.join()
 
+        self.closed = True
+
     def send_msg(self, msg):
         delimited_message = str(msg) + Channel.DELIM
         try:
             if self.socket != None:
                 self.socket.send(delimited_message.encode())
-        except e:
+        except Exception as e:
             #writing on the pipe failed, there was probably a crash...
             #kill the thread so we can regen it when they come back
             self.stop()

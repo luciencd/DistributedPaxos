@@ -71,12 +71,12 @@ class Communicator:
     def open_connections(self):
         for i in range(0, len(self.channels),1):
             new_socket = None
-            if self.channels[i] == None and i != self.id:
+            if (self.channels[i] == None or self.channels[i].closed) and i != self.id:
                 new_socket = self.make_socket()
                 try:
                     new_socket.connect(self.nodes[i])
                     self.channels[i] = Channel(i, new_socket)
-                    self.channels[i].start(True)
+                    self.channels[i].start(self.id)
                 except OSError as e:
                     if e.errno != 10061 and e.errno != 111 and e.errno != 61:
                         raise e
@@ -120,7 +120,7 @@ class Communicator:
         my_clock = Log.get_clock();
         for site in range(0,len(self.nodes),1):
             NP = Log.get_not_hasRecv(site)
-            if len(NP) > 0 and self.channels[site] != None:
+            if len(NP) > 0 and self.channels[site] != None and not self.channels[site].closed:
                 message = Message(my_clock, NP).toJSON()
                 self.channels[site].send_msg(message)
         return True
