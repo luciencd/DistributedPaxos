@@ -194,3 +194,8 @@ class Log:
         results = cur.execute(query, {"self": Log.id}).fetchall()
         cnx.close()
         return Log.create_events(results)
+
+    ##this is so that we can automatically test the fault tolerance of our database, by resetting its contents to be empty.
+    @staticmethod
+    def reset():
+        raise NotImplementedError

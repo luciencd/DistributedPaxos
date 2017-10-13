@@ -77,7 +77,11 @@ def main():
                 Log.unblock(new_unblock)
             else:
                 print("Invalid unblock, doing nothing.")
-
+                
+        elif user_option == "reset":
+            ##to make sure the system is fault tolerant.
+            print("Deleting entire database.")
+            Log.reset()
         elif user_option =="quit":
             print("Shutting down...")
 
