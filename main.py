@@ -5,6 +5,7 @@ from log import Log
 from event import event, EventTypes
 from datetime import datetime, date
 from dateutil import tz
+import socket
 
 DEFAULT_FILENAME = "config.txt"
 DEFAULT_PORT = 8923
@@ -40,10 +41,19 @@ def collect_unblock(site,now_time):
         return None
     return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,now_time)
 
+def discover_ip():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.connect(("8.8.8.8", 0))
+    sock.setblocking(False)
+    ip = sock.getsockname()[0]
+    sock.close()
+    return ip
+
 
 def main():
     own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
-    own_addr = "127.0.0.1" #TODO: detecting IP is annoying (open a socket to internet, check hostname)
+    own_addr = discover_ip()
+    print("My addr is",own_addr)
     own_binding = (own_addr,own_port);
 
     nodes = readConfig()
