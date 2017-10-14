@@ -105,6 +105,7 @@ class Communicator:
                 n = new_sock.recv(4096).decode().strip()
                 if n.isdigit():
                     n = int(n);
+
                     if self.channels[n] != None:
                         self.channels[n].stop()
                     self.channels[n] = Channel(n, new_sock)

@@ -59,7 +59,7 @@ def main():
         #get current time.
         now_time = datetime.utcnow()
         now_time = now_time.replace(tzinfo=tz.tzutc()).replace(microsecond=0)
-        #print(now_time.replace(microsecond=0))
+
         if user_option == "tweet":
             new_tweet = collect_tweet(communicator.id,now_time,communicator.name)
             Log.tweet(new_tweet)
@@ -83,6 +83,7 @@ def main():
                 Log.unblock(new_unblock)
             else:
                 print("Invalid unblock, doing nothing.")
+                
         elif user_option == "name":
             print("My name is:",communicator.name)
 

@@ -36,7 +36,6 @@ class Channel:
         delimited_message = str(msg) + Channel.DELIM
         try:
             if self.socket != None:
-                print("sending message",delimited_message)
                 self.socket.send(delimited_message.encode())
 
         except Exception as e:
@@ -54,7 +53,6 @@ class Channel:
                     message = message + self.socket.recv(4096).decode()
 
                 if message != "":
-                    print("received message")
                     message_converted = Message.fromJSON(message.strip())
                     Log.receive(message_converted, self.id)
 
