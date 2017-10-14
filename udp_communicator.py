@@ -68,7 +68,8 @@ class Communicator:
             try:
                 data,sender = self.listener.recvfrom(4096)
                 sender_addr = sender[0]
-                if sender_addr != self.nodes[self.id]: #when we send to ourself, we've been shut down
+
+                if sender_addr != self.nodes[self.id] and self.partial_received.get(sender_addr) != None: #when we send to ourselves or don't get a valid addr, we've been shut down
                     self.partial_received[sender_addr] = self.partial_received[sender_addr] + data.decode()
                     sender_id = self.nodes_by_addr.get(sender_addr)
                     if sender_id != None:
