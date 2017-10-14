@@ -79,6 +79,7 @@ class Communicator:
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
                             message_converted = Message.fromJSON(next_msg.strip())
                             Log.receive(message_converted, self.id)
+                            Log.receive(message_converted, sender_id)
 
             except OSError as e:
                 if e.errno != 10038 or not self.begin_shutdown:
