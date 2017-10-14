@@ -18,7 +18,7 @@ class Communicator:
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
 
-        self.partial_received = {site: "" for site in self.nodes}
+        self.partial_received = {site[0]: "" for site in self.nodes}
 
 
     '''
@@ -67,15 +67,16 @@ class Communicator:
         while False == self.begin_shutdown:
             try:
                 data,sender = self.listener.recvfrom(4096)
-                if sender[0] != 0: #when sender addr is 0, we've been shut down
-                    self.partial_received[sender] = self.partial_received[sender] + data.decode().strip()
+                sender_addr = sender[0]
+                if sender_addr != self.nodes[self.id]: #when we send to ourself, we've been shut down
+                    self.partial_received[sender_addr] = self.partial_received[sender_addr] + data.decode().strip()
 
-                    sender_id = self.nodes_by_addr.get(sender)
+                    sender_id = self.nodes_by_addr.get(sender_addr)
                     if sender_id != None:
-                        while Communicator.DELIM in self.partial_received[sender]:
-                            split = self.partial_received[sender].split(Communicator.DELIM)
+                        while Communicator.DELIM in self.partial_received[sender_addr]:
+                            split = self.partial_received[sender_addr].split(Communicator.DELIM)
                             next_msg = split[0]
-                            self.partial_received[sender] = Communicator.DELIM.join(split[1:])
+                            self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
 
                             message_converted = Message.fromJSON(next_msg.strip())
                             Log.receive(message_converted, self.id)
