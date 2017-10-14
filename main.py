@@ -51,14 +51,11 @@ def discover_ip():
 
 
 def main():
-    own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
     own_addr = discover_ip()
-    print("My addr is",own_addr)
-    own_binding = (own_addr,own_port);
 
     nodes,names = readConfig()
 
-    communicator = Communicator(nodes,own_binding)
+    communicator = Communicator(nodes,own_addr)
     communicator.start()
     self_id = communicator.id
 

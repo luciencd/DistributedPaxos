@@ -7,14 +7,14 @@ from message import Message
 
 class Communicator:
     DELIM = "\n"
-    def __init__(self, nodes_, binding_):
+    def __init__(self, nodes_, own_addr_):
         #store the list of sites we know about
         self.nodes = nodes_
-        #store an inverted lookup table where knowing an addr and port allows us
+        #store an inverted lookup table where knowing an addr allows us
         #to find a node number -- this will be useful for processing socket data
-        self.nodes_by_addr = dict(zip(self.nodes, itertools.count()))
+        self.nodes_by_addr = dict(zip(map(lambda x:x[0],self.nodes), itertools.count()))
         #look ourselves up in the reversed table to find our Site ID
-        self.id = self.nodes_by_addr.get(binding_)
+        self.id = self.nodes_by_addr.get(own_addr_)
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
 
