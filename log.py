@@ -95,12 +95,11 @@ class Log:
         for e in dict_new_unblocks:
             cur.execute(unblock_statement, {"blocker": e.get_blocker(), "blocked": e.get_blocked()})
 
+        Log.__trim_log(cnx)
+
         cnx.commit()
         cnx.close()
 
-    @staticmethod
-    def trim_old_blocks():
-        raise NotImplementedError
 
 
     @staticmethod
@@ -155,6 +154,13 @@ class Log:
         query = "DELETE FROM Blocks WHERE blocker = :blocker AND blocked = :blocked"
         cur = cnx.cursor()
         results = cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
+
+
+    @staticmethod
+    def __trim_log(cnx):
+        query = "DELETE FROM Log WHERE op in ('block', 'unblock') and timestamp <= (select MIN(knows_about) from T where knows_about = Log.site)"
+        cur = cnx.cursor()
+        cur.execute(query,{"blocker": event.get_blocker(), "blocked": event.get_blocked()})
 
 
     @staticmethod

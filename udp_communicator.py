@@ -78,7 +78,6 @@ class Communicator:
                             next_msg = split[0]
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
                             message_converted = Message.fromJSON(next_msg.strip())
-                            Log.receive(message_converted, self.id)
                             Log.receive(message_converted, sender_id)
 
             except OSError as e:
@@ -100,7 +99,6 @@ class Communicator:
         #spec explicitly says to only send to unblocked sites
         my_blocks = Log.get_blocks();
         unblocked_sites = set(range(0,len(self.nodes))) - set(my_blocks)
-
         unblocked_sites.remove(self.id)
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
