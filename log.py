@@ -13,6 +13,7 @@ class Log:
             "`site` INT NOT NULL,"
             "`op` VARCHAR(16) NOT NULL,"
             "`data` VARCHAR(144) NOT NULL,"
+            "`name` VARCHAR(144) NOT NULL,"
             "`truetime` DATETIME NOT NULL,"
             "PRIMARY KEY (timestamp, site)"
         ")"),
@@ -79,7 +80,7 @@ class Log:
         cur.execute("DROP TABLE T_REMOTE")
 
         log_updates = [str((e.site, e.op, e.data, e.timestamp, e.truetime)) for e in message.events]
-        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp, truetime) VALUES" + (",".join(log_updates)))
+        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp, name, truetime) VALUES" + (",".join(log_updates)))
 
         dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
                                   and not e.related_unblock_exists(message.events),
@@ -131,15 +132,16 @@ class Log:
     @staticmethod
     def _do_local_event(cnx, event):
             Log.__increment_clock(cnx)
-            query = """INSERT INTO Log (timestamp, site, op, data, truetime) VALUES (
+            query = """INSERT INTO Log (timestamp, site, op, data, name, truetime) VALUES (
                (SELECT timestamp from T WHERE site=:id AND knows_about=:id),
                :id,
                :op,
                :body,
+               :name,
                :truetime)"""
-
+               
             cur = cnx.cursor()
-            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data, "truetime":event.truetime})
+            cur.execute(query, {"id": event.site, "op": event.op, "body": event.data, "name":event.name, "truetime":event.truetime})
 
 
     @staticmethod
@@ -164,7 +166,7 @@ class Log:
 
     @staticmethod
     def create_events(result_obj):
-        return [ event(site,op,data,truetime,time) for time,site,op,data,truetime in result_obj ]
+        return [ event(site,op,data,truetime,name,time) for time,site,op,data,name,truetime in result_obj ]
 
 
     @staticmethod

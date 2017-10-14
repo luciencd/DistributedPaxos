@@ -9,13 +9,14 @@ class EventTypes:
 
 class event:
     DELIM = ","
-    def __init__(self,site,op,body,truetime,timestamp=-1):
+    def __init__(self,site,op,body,truetime,name,timestamp=-1):
         self.site = site
         self.op = op
         self.data = body
         self.timestamp = timestamp
         #when constructing this, assume the tweet's time is in UTC, and should be converted in the __str__ "view"
         self.truetime = truetime
+        self.name = name
 
     def get_tweet(self):
         if(self.op == EventTypes.TWEET):
@@ -46,4 +47,4 @@ class event:
 
     def __str__(self):
         localtime = parse(self.truetime).astimezone(tz.tzlocal())
-        return "{} by {} at {}:\n   {}".format(self.op.title(),self.site,localtime.strftime('%Y-%m-%d %H:%M:%S'),self.data)
+        return "{} by {} at {}:\n   {}".format(self.op.title(),self.name,localtime.strftime('%Y-%m-%d %H:%M:%S'),self.data)
