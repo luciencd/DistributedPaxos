@@ -69,15 +69,13 @@ class Communicator:
                 data,sender = self.listener.recvfrom(4096)
                 sender_addr = sender[0]
                 if sender_addr != self.nodes[self.id]: #when we send to ourself, we've been shut down
-                    self.partial_received[sender_addr] = self.partial_received[sender_addr] + data.decode().strip()
-
+                    self.partial_received[sender_addr] = self.partial_received[sender_addr] + data.decode()
                     sender_id = self.nodes_by_addr.get(sender_addr)
                     if sender_id != None:
                         while Communicator.DELIM in self.partial_received[sender_addr]:
                             split = self.partial_received[sender_addr].split(Communicator.DELIM)
                             next_msg = split[0]
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
-
                             message_converted = Message.fromJSON(next_msg.strip())
                             Log.receive(message_converted, self.id)
 
