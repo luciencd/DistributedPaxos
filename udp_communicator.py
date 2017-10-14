@@ -100,6 +100,7 @@ class Communicator:
         my_blocks = Log.get_blocks();
         unblocked_sites = set(range(0,len(self.nodes))) - set(my_blocks)
 
+        unblocked_sites.remove(self.id)
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
         for site in unblocked_sites:

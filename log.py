@@ -195,7 +195,7 @@ class Log:
         cur = cnx.cursor()
         results = cur.execute(query, {"me": Log.id}).fetchall()
         cnx.close()
-        return results
+        return [result[0] for result in results] #sqlite stupid enough to return a tuple of 1 element for single column queries, so we unpack
 
 
     @staticmethod
