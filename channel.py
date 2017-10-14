@@ -37,6 +37,7 @@ class Channel:
         try:
             if self.socket != None:
                 self.socket.send(delimited_message.encode())
+
         except Exception as e:
             #writing on the pipe failed, there was probably a crash...
             #kill the thread so we can regen it when they come back
@@ -47,6 +48,7 @@ class Channel:
         while message != "":
             try:
                 message = self.socket.recv(4096).decode()
+
                 while message != "" and not Channel.DELIM in message:
                     message = message + self.socket.recv(4096).decode()
 

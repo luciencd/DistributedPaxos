@@ -8,19 +8,24 @@ from message import Message
 
 class Communicator:
 
-    def __init__(self, nodes_, binding_):
+    def __init__(self, nodes_, names_, binding_):
         #store the list of sites we know about
         self.nodes = nodes_
+        self.names = names_
         #store an inverted lookup table where knowing an addr and port allows us
         #to find a node number -- this will be useful for processing socket data
         self.nodes_by_addr = dict(zip(self.nodes, itertools.count()))
+        self.name_by_id = dict(zip(itertools.count(),self.names))
         #look ourselves up in the reversed table to find our Site ID
+
         self.id = self.nodes_by_addr.get(binding_)
+        self.name = self.name_by_id.get(self.id)
         #create a placeholder array of our communication channels to other sites
         #this will be populated by open_connections() and listener.accept()
         self.channels = [None for _ in self.nodes]
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
+
 
 
     '''
@@ -100,6 +105,7 @@ class Communicator:
                 n = new_sock.recv(4096).decode().strip()
                 if n.isdigit():
                     n = int(n);
+
                     if self.channels[n] != None:
                         self.channels[n].stop()
                     self.channels[n] = Channel(n, new_sock)
@@ -124,3 +130,6 @@ class Communicator:
                 message = Message(my_clock, NP).toJSON()
                 self.channels[site].send_msg(message)
         return True
+
+    def get_name(self):
+        return self.name
