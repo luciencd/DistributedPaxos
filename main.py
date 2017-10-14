@@ -44,7 +44,7 @@ def collect_unblock(site,now_time,names):
     unblocked_text = str(unblocked_text) if unblocked_text.isdigit() else str(names.index(unblocked_text))
     return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,now_time,names[site])
 
-def discover_ip(communicator):
+def discover_site(communicator):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.connect(("8.8.8.8", 0))
     sock.setblocking(False)
@@ -52,11 +52,11 @@ def discover_ip(communicator):
     sock.close()
 
     potential_id = communicator.nodes_by_addr.get(ip)
-    if potential_id = None:
+    if potential_id == None:
         #We might be in EC2 -- try to discover public IP via their metadata API
-        ip = urlopen("http://169.254.169.254/latest/meta-data/local-ipv4")
-        potential_id = communicator.nodes_by_Addr.get(ip)
-        if potential_id = None:
+        ip = urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").readlines()[0].decode()
+        potential_id = communicator.nodes_by_addr.get(ip)
+        if potential_id == None:
             #TODO: it'd be nice if we had a generic way to run this behind NAT
             raise NotImplementedError("Running behind a non-EC2 router is not currently supported.")
     return potential_id
