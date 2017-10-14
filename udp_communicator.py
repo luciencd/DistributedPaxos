@@ -36,10 +36,7 @@ class Communicator:
     '''
     def stop(self):
         self.begin_shutdown = True
-
-        self.listener.shutdown(socket.SHUT_RDWR)
         self.listener.close()
-
         self.listener_thread.join()
 
     '''
@@ -70,17 +67,18 @@ class Communicator:
         while False == self.begin_shutdown:
             try:
                 data,sender = self.listener.recvfrom(4096)
-                self.partial_received[sender] = self.partial_received[sender] + data.decode().strip()
+                if sender[0] != 0: #when sender addr is 0, we've been shut down
+                    self.partial_received[sender] = self.partial_received[sender] + data.decode().strip()
 
-                sender_id = self.nodes_by_addr.get(sender)
-                if sender_id != None:
-                    while UDPCommunicator.DELIM in self.partial_received[sender]:
-                        split = self.partial_received[sender].split(UDPCommunicator.DELIM)
-                        next_msg = split[0]
-                        self.partial_received[sender] = UDPCommunicator.DELIM.join(split[1:])
+                    sender_id = self.nodes_by_addr.get(sender)
+                    if sender_id != None:
+                        while Communicator.DELIM in self.partial_received[sender]:
+                            split = self.partial_received[sender].split(Communicator.DELIM)
+                            next_msg = split[0]
+                            self.partial_received[sender] = Communicator.DELIM.join(split[1:])
 
-                        message_converted = Message.fromJSON(next_msg.strip())
-                        Log.receive(message_converted, self.id)
+                            message_converted = Message.fromJSON(next_msg.strip())
+                            Log.receive(message_converted, self.id)
 
             except OSError as e:
                 if e.errno != 10038 or not self.begin_shutdown:
@@ -107,7 +105,7 @@ class Communicator:
         for site in unblocked_sites:
             NP = Log.get_not_hasRecv(site)
             if len(NP) > 0:
-                message = Message(my_clock, NP).toJSON() + UDPCommunicator.DELIM
-                outgoing_sock.sendto(message, self.nodes[site])
+                message = Message(my_clock, NP).toJSON() + Communicator.DELIM
+                outgoing_sock.sendto(message.encode(), self.nodes[site])
 
         outgoing_sock.close()
