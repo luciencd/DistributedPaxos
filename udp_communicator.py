@@ -1,7 +1,6 @@
 import itertools
 import threading
 import socket
-from channel import Channel
 from log import Log
 from message import Message
 
@@ -103,7 +102,7 @@ class Communicator:
         my_blocks = Log.get_blocks();
         unblocked_sites = set(range(0,len(self.nodes))) - set(my_blocks)
 
-        outgoing_sock = make_socket()
+        outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
         for site in unblocked_sites:
             NP = Log.get_not_hasRecv(site)

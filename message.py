@@ -17,5 +17,5 @@ class Message:
         #json.loads deserializes the object incorrectly
         for row in range(0,len(new_msg.clock),1):
             new_msg.clock[row] = [x[0] for x in new_msg.clock[row]]
-        new_msg.events = [event(e["site"], e["op"], e["data"], e["truetime"], e["timestamp"]) for e in new_msg.events]
+        new_msg.events = [event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"]) for e in new_msg.events]
         return new_msg

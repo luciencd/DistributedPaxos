@@ -34,8 +34,9 @@ class Log:
     id = -1
 
     @staticmethod
-    def start(nodes_count, id):
+    def start(nodes_count, id, names):
         Log.id = id
+        Log.names = names
         cnx = sqlite3.connect(Log.DATABASE_FILE,detect_types=sqlite3.PARSE_DECLTYPES)
         cur = cnx.cursor()
         for _,create_statement in Log.tables.items():
@@ -163,9 +164,8 @@ class Log:
         results = cur.execute(query,{"me": Log.id})
 
     @staticmethod
-    def create_events(result_obj):
-        return [ event(site,op,data,truetime,time) for time,site,op,data,truetime in result_obj ]
-
+    def create_events(results_obj):
+        return [ event(site,op,data,truetime,Log.names[site],time) for time,site,op,data,truetime in results_obj ]
 
     @staticmethod
     def get_not_hasRecv(site):
