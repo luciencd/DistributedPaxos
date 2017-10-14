@@ -61,7 +61,7 @@ class Communicator:
         binding = self.nodes[self.id]
         self.listener = self.make_socket()
         #prepare the socket for listening
-        self.listener.bind(binding)
+        self.listener.bind(('0.0.0.0', binding[1]))
 
         while False == self.begin_shutdown:
             try:
