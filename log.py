@@ -208,7 +208,7 @@ class Log:
     def view():
         cnx = sqlite3.connect(Log.DATABASE_FILE)
         #SELECT all from the Log table where op=tweet, and where site is not in blocked of where the tweet is coming from.
-        query = "SELECT * FROM Log WHERE op = 'tweet' AND NOT EXISTS (SELECT * FROM Blocks WHERE blocker = Log.site AND blocked = :self) ORDER BY truetime"
+        query = "SELECT * FROM Log WHERE op = 'tweet' AND NOT EXISTS (SELECT * FROM Blocks WHERE blocker = Log.site AND blocked = :self) ORDER BY truetime DESC"
         cur = cnx.cursor()
         results = cur.execute(query, {"self": Log.id}).fetchall()
         cnx.close()
