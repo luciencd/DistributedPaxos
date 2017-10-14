@@ -79,7 +79,7 @@ class Log:
         {"sender": sender, "me": Log.id})
         cur.execute("DROP TABLE T_REMOTE")
 
-        log_updates = [str((e.site, e.op, e.data, e.timestamp, e.truetime)) for e in message.events]
+        log_updates = [str((e.site, e.op, e.data, e.timestamp, e.name, e.truetime)) for e in message.events]
         cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp, name, truetime) VALUES" + (",".join(log_updates)))
 
         dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
@@ -139,7 +139,7 @@ class Log:
                :body,
                :name,
                :truetime)"""
-               
+
             cur = cnx.cursor()
             cur.execute(query, {"id": event.site, "op": event.op, "body": event.data, "name":event.name, "truetime":event.truetime})
 
