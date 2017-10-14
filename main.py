@@ -1,6 +1,6 @@
 import sys
 import os
-from communicator import Communicator
+from udp_communicator import Communicator
 from log import Log
 from event import event, EventTypes
 from datetime import datetime, date

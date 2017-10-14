@@ -189,6 +189,16 @@ class Log:
         return [ ordered_results[start:start+num_sites] for start in range(0,num_sites**2, num_sites)]
 
     @staticmethod
+    def get_blocks():
+        cnx = sqlite3.connect(Log.DATABASE_FILE)
+        query = "SELECT blocked FROM Blocks where blocker = :me"
+        cur = cnx.cursor()
+        results = cur.execute(query, {"me": Log.id}).fetchall()
+        cnx.close()
+        return results
+
+
+    @staticmethod
     def view():
         cnx = sqlite3.connect(Log.DATABASE_FILE)
         #SELECT all from the Log table where op=tweet, and where site is not in blocked of where the tweet is coming from.
