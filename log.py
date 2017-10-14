@@ -158,7 +158,7 @@ class Log:
 
     @staticmethod
     def __trim_log(cnx):
-        query = "DELETE FROM Log WHERE op in ('block', 'unblock') and timestamp <= (select MIN(knows_about) from T where knows_about = Log.site)"
+        query = "DELETE FROM Log WHERE op in ('block', 'unblock') and timestamp <= (select MIN(timestamp) from T where knows_about = Log.site)"
         cur = cnx.cursor()
         cur.execute(query)
 
