@@ -22,23 +22,26 @@ def readConfig():
     return (list(map(lambda x: x[:-1],nodes)),list(map(lambda x: x[-1],nodes)))
 
 
-def collect_tweet(site,now_time,self_name):
+def collect_tweet(site,now_time,names):
     tweet_text = input("Enter your tweet: ")
 
-    #print(now_time.astimezone(tz.tzlocal()))
-    return event(site, EventTypes.TWEET, tweet_text,now_time,self_name)
+    return event(site, EventTypes.TWEET, tweet_text,now_time,names[site])
 
-def collect_block(site,now_time,self_name):
+def collect_block(site,now_time,names):
     blocked_text = input("Enter your block: ")
-    if not blocked_text.isdigit():
+    if (blocked_text.isdigit() and int(blocked_text) > len(names)) \
+         or blocked_text not in set(names):
         return None
-    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,now_time,self_name)
+    blocked_text = str(blocked_text) if blocked_text.isdigit() else str(names.index(blocked_text))
+    return event(site, EventTypes.BLOCK, str(site) + event.DELIM + blocked_text,now_time,names[site])
 
-def collect_unblock(site,now_time,self_name):
+def collect_unblock(site,now_time,names):
     unblocked_text = input("Enter your unblock: ")
-    if not unblocked_text.isdigit():
+    if (unblocked_text.isdigit() and int(unblocked_text) > len(names)) \
+         or unblocked_text not in set(names):
         return None
-    return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,now_time,self_name)
+    unblocked_text = str(unblocked_text) if unblocked_text.isdigit() else str(names.index(unblocked_text))
+    return event(site, EventTypes.UNBLOCK, str(site) + event.DELIM + unblocked_text,now_time,names[site])
 
 def discover_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -70,7 +73,7 @@ def main():
         now_time = now_time.replace(tzinfo=tz.tzutc()).replace(microsecond=0)
 
         if user_option == "tweet":
-            new_tweet = collect_tweet(self_id,now_time,names[self_id])
+            new_tweet = collect_tweet(self_id,now_time,names)
             Log.tweet(new_tweet)
             communicator.tweet()
 
@@ -80,14 +83,14 @@ def main():
             print(*list_tweets, sep="\n\n", end = "\n\n")
 
         elif user_option =="block":
-            new_block = collect_block(self_id,now_time,names[self_id])
+            new_block = collect_block(self_id,now_time,names)
             if new_block != None:
                 Log.block(new_block)
             else:
                 print("Invalid block, doing nothing.")
 
         elif user_option =="unblock":
-            new_unblock = collect_unblock(self_id,now_time,names[self_id])
+            new_unblock = collect_unblock(self_id,now_time,names)
             if new_unblock != None:
                 Log.unblock(new_unblock)
             else:
