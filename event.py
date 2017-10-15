@@ -52,7 +52,7 @@ class event:
             and e.timestamp > self.timestamp \
             and self.op == EventTypes.UNBLOCK, event_list))
 
-            return len(linked_unblocks) > 0
+        return len(linked_unblocks) > 0
 
 
 
