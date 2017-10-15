@@ -83,14 +83,17 @@ class Log:
         cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp, truetime) VALUES" + (",".join(log_updates)))
 
         dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
-                                  and not e.related_unblock_exists(message.events),
+                                  and not e.superceding_unblock_exists(message.events),
                                   message.events))
 
         if len(dict_new_blocks) > 0:
             dict_block_values = [str((e.get_blocker(), e.get_blocked())) for e in dict_new_blocks]
             cur.execute("INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES" + ",".join(dict_block_values))
 
-        dict_new_unblocks = list(filter(lambda e: e.op == EventTypes.UNBLOCK, message.events))
+        dict_new_unblocks = list(filter(lambda e: e.op == EventTypes.UNBLOCK \
+                                  and not e.superceding_block_exists(message.events),
+                                  message.events))
+                                  
         unblock_statement = "DELETE FROM Blocks where blocker = :blocker and blocked = :blocked"
         for e in dict_new_unblocks:
             cur.execute(unblock_statement, {"blocker": e.get_blocker(), "blocked": e.get_blocked()})

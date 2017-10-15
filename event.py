@@ -36,13 +36,24 @@ class event:
         else:
             return None
 
-    def related_unblock_exists(self, event_list):
+    def superceding_unblock_exists(self, event_list):
         linked_unblocks = list(filter(lambda e: e.site == self.site \
             and e.data == self.data \
             and e.op == EventTypes.UNBLOCK \
+            and e.timestamp > self.timestamp \
             and self.op == EventTypes.BLOCK, event_list))
 
         return len(linked_unblocks) > 0
+
+    def superceding_block_exists(self, event_list):
+        linked_unblocks = list(filter(lambda e: e.site == self.site \
+            and e.data == self.data \
+            and e.op == EventTypes.BLOCK \
+            and e.timestamp > self.timestamp \
+            and self.op == EventTypes.UNBLOCK, event_list))
+
+            return len(linked_unblocks) > 0
+
 
 
     def __str__(self):
