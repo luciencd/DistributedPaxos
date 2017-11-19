@@ -92,6 +92,8 @@ class Communicator:
         broadcaster.daemon = True #implicitly detach thread in start (we don't care about return or joining)
         broadcaster.start()
 
+    #for broadcasting the message, once a value is chosen, don't you have to be the master listener?
+    #also you only send a single message when this happens right? because one is decided by consensus each round?
     def broadcast_message(self):
         my_clock = Log.get_clock();
 

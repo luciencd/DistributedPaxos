@@ -73,6 +73,7 @@ def main():
 
     communicator.start(self_id)
 
+    client = Client()
 
     Log.start(len(nodes), communicator.id, names)
 
@@ -85,25 +86,35 @@ def main():
 
         if user_option == "tweet":
             new_tweet = collect_tweet(self_id,now_time,names)
-            Log.tweet(new_tweet)
-            communicator.tweet()
+
+            #don't add to log until you reach consensus and the tweet is chosen.
+            client.tweet(new_tweet)
+
+            #Log.tweet(new_tweet)
+            #communicator.tweet()
 
         elif user_option =="view":
-            list_tweets =Log.view()
+            list_tweets = Log.view()
             print()
             print(*list_tweets, sep="\n\n", end = "\n\n")
 
         elif user_option =="block":
             new_block = collect_block(self_id,now_time,names)
+
+            #don't add to log until you reach consensus and the tweet is chosen.
             if new_block != None:
-                Log.block(new_block)
+                client.block(new_block)
+                #Log.block(new_block)
             else:
                 print("Invalid block, doing nothing.")
 
         elif user_option =="unblock":
             new_unblock = collect_unblock(self_id,now_time,names)
+
+            #don't add to log until you reach consensus and the tweet is chosen.
             if new_unblock != None:
-                Log.unblock(new_unblock)
+                client.unblock(new_unblock)
+                #Log.unblock(new_unblock)
             else:
                 print("Invalid unblock, doing nothing.")
 

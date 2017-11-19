@@ -3,6 +3,7 @@ from event import event, EventTypes
 from math import sqrt
 import sys
 
+#this log class shouldn't change, but it will be called from the client
 class Log:
     DATABASE_FILE = "database.db"
 
@@ -93,7 +94,7 @@ class Log:
         dict_new_unblocks = list(filter(lambda e: e.op == EventTypes.UNBLOCK \
                                   and not e.superceding_block_exists(message.events),
                                   message.events))
-                                  
+
         unblock_statement = "DELETE FROM Blocks where blocker = :blocker and blocked = :blocked"
         for e in dict_new_unblocks:
             cur.execute(unblock_statement, {"blocker": e.get_blocker(), "blocked": e.get_blocked()})
