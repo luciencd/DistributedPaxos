@@ -98,13 +98,15 @@ class Communicator:
         my_clock = Log.get_clock();
 
         #spec explicitly says to only send to unblocked sites
-        my_blocks = Log.get_blocks();
-        unblocked_sites = set(range(0,len(self.nodes))) - set(my_blocks)
-        unblocked_sites.remove(self.id)
+        #not in paxos though, as all logs must be equal.
+        sites = set(range(0,len(self.nodes)))
+        sites.remove(self.id)
+
+        #figure out what this does.
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
-        for site in unblocked_sites:
-            NP = Log.get_not_hasRecv(site)
+        for site in sites:
+            NP = Log.get_not_hasRecv(site)#still needs to exist, if a process dies and is reset (and missed some logs)
             if len(NP) > 0:
                 message = Message(my_clock, NP).toJSON() + Communicator.DELIM
                 outgoing_sock.sendto(message.encode(), self.nodes[site])
