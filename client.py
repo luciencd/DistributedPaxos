@@ -25,6 +25,14 @@ class Client:
 
     self.event_queue = []
 
+
+    def readMessage(message):
+
+        if(message.messageType()=="proposal"):
+            pass
+
+        ##so on.
+
     def tweet(new_tweet):
         self.event_queue.append(new_tweet)
         #add to queue of proposals you want accepted (ordered) (in memory)
