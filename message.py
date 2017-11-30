@@ -2,51 +2,84 @@
 import json
 from event import event
 
+class MessageNotRecognizedError(ValueError): pass
+
 class Message:
     def toJSON(self):
         return json.dumps(self, default=lambda x: x.__dict__)
 
 
 class Prepare(Message):
-    self.msg_type = "prepare"
-    def __init__(self,n,index):
-        self.n = n #proposal number.
-        self.index = index #what index are we consensusing for multi-paxos
+
+    def __init__(self,proposalNumber,process):
+        self.msg_type = "prepare"
+        self.n = proposalNumber #proposal number.
+        #self.index = index #what index are we consensusing for multi-paxos
+        ##is this actually necessary? no.
+        self.p = process
 
 class Promise(Message):
-    self.msg_type = "promise"
-    def __init__(self,acceptedProposal,acceptedValue,index):
-        self.acceptedProposal = acceptedProposal #proposal number.
-        self.acceptedValue = acceptedValue #consensus choice value
-        self.index = index #what index are we consensusing for multi-paxos
 
+    def __init__(self,acceptedProposal,acceptedValue,index,process):
+        self.msg_type = "promise"
+        self.n = acceptedProposal #proposal number (n).
+        self.v = acceptedValue #consensus choice value (event)
+        self.i = index #what index are we consensusing for multi-paxos
+        self.p = process
+        
 class AcceptRequest(Message):
-    self.msg_type = "acceptRequest"
-    def __init__(self,n,events):
-        self.n = n
-        self.value = events#really a list of size one
+
+    def __init__(self,acceptedProposal,acceptedValue,index,process):
+        self.msg_type = "acceptRequest"
+        self.n = acceptedProposal #proposal number (n).
+        self.v = acceptedValue #consensus choice value (event)
+        self.i = index #what index are we consensusing for multi-paxos
+        self.p = process
 
 class Accepted(Message):
-    self.msg_type = "accepted"
-    def __init__(self,minProposal):
-        self.minProposal = minProposal
+
+    def __init__(self,minProposal,index,process):
+        self.msg_type = "accepted"
+        self.n = minProposal
+        self.i = index
+        self.p = process
+        #unsure if we need to include value v... if proposer(n) can't be < n, and if it is greater than proposer(n), the proposer failed
+        ##and if it is equal, the proposer(n), already knows its own value
 
 class MessageReader:
     @staticmethod
     def fromJSON(payload):
+        ##getting data from payload as a dictionary
         dict_data = json.loads(payload)
-        if(dict_data["msg_type"]=="prepare"):
-            Prepare(dict_data["n"],dict_data["index"])
-        #json.loads deserializes the object incorrectly
-        for row in range(0,len(new_msg.clock),1):
-            new_msg.clock[row] = [x[0] for x in new_msg.clock[row]]
-        new_msg.events = [event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"]) for e in new_msg.events]
+
+        if(dict_data["msg_type"] == "prepare"):
+            new_msg = Prepare(dict_data["n"],dict_data["p"])
+        elif(dict_data["msg_type"] == "promise"):
+            e = dict_data["v"]
+            if(e != None):
+                v = event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"])
+                new_msg = Promise(dict_data["n"],v,dict_data["i"])
+            else:
+                new_msg = Promise(dict_data["n"],None,dict_data["i"],dict_data["p"])
+
+        elif(dict_data["msg_type"] == "acceptRequest"):
+            e = dict_data["v"]
+            if(e != None):
+                v = event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"])
+                new_msg = AcceptRequest(dict_data["n"],v,dict_data["i"],dict_data["p"])
+            else:
+                new_msg = AcceptRequest(dict_data["n"],None,dict_data["i"],dict_data["p"])
+        elif(dict_data["msg_type"] == "accepted"):
+            new_msg = Accepted(dict_data["n"],dict_data["i"],dict_data["p"])
+        else:
+            raise MessageNotRecognizedError
+
         return new_msg
 
-class Data(Message)
-    def __init__(self,clock,events):
-        self.clock = clock
-        self.events = events
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda x: x.__dict__)
+'''
+#json.loads deserializes the object incorrectly
+    for row in range(0,len(dict_data.n),1):
+        dict_data.n[row] = [x[0] for x in new_msg.clock[row]]
+    new_msg.events = [event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"]) for e in new_msg.events]
+    '''
