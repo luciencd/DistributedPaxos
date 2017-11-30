@@ -73,7 +73,7 @@ def main():
 
     communicator.start(self_id)
 
-    client = Client()
+    client = Client(communicator.id,Proposer(self.id),Acceptor(self.id),Learner(self.id))
 
     Log.start(len(nodes), communicator.id, names)
 

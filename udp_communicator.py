@@ -4,7 +4,7 @@ import socket
 from log import Log
 from message import Message
 
-
+#subclass communicator into UDP communicator and TCP communicator.
 class Communicator:
     DELIM = "\n"
     def __init__(self, nodes_):
@@ -76,9 +76,11 @@ class Communicator:
                             split = self.partial_received[sender_addr].split(Communicator.DELIM)
                             next_msg = split[0]
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
-                            message_converted = Message.fromJSON(next_msg.strip())
 
-                            Client.readMessage(message_converted)
+                            received_message = MessageReader.fromJSON(next_msg.strip())
+                            ##now we have the message object
+
+                            Client.readMessage(received_message)
                             #Log.receive(message_converted, sender_id)
 
             except OSError as e:
@@ -89,28 +91,47 @@ class Communicator:
 
         return True
 
-    def tweet(self):
-        broadcaster = threading.Thread(target=self.broadcast_message)
+    def propose(self,propose_message):
+        broadcaster = threading.Thread(target=self.broadcast_synod,args= (propose_message,))
         broadcaster.daemon = True #implicitly detach thread in start (we don't care about return or joining)
         broadcaster.start()
 
-    #for broadcasting the message, once a value is chosen, don't you have to be the master listener?
-    #also you only send a single message when this happens right? because one is decided by consensus each round?
-    def broadcast_message(self):
-        my_clock = Log.get_clock();
+    def promise(self,promise_message):
+        sender = threading.Thread(target=self.send_synod,args= (promise_message,))
+        sender.daemon = True #implicitly detach thread in start (we don't care about return or joining)
+        sender.start()
 
-        #spec explicitly says to only send to unblocked sites
-        #not in paxos though, as all logs must be equal.
+    def acceptRequest(self,accept_request_message):
+        broadcaster = threading.Thread(target=self.broadcast_synod,args= (accept_request_message,))
+        broadcaster.daemon = True #implicitly detach thread in start (we don't care about return or joining)
+        broadcaster.start()
+
+    def accept(self,accept_message):
+        sender = threading.Thread(target=self.send_synod,args= (accept_message,))
+        sender.daemon = True #implicitly detach thread in start (we don't care about return or joining)
+        sender.start()
+
+    ##when we want to send a message from the proposers to everyone (all nodes) (because all nodes/clients are acceptors)
+    def broadcast_synod(self,message):#will send out proposals and acceptRequests to all processes.
         sites = set(range(0,len(self.nodes)))
         sites.remove(self.id)
+        ##this will be a quorum of sites, all of them
 
         #figure out what this does.
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
         for site in sites:
-            NP = Log.get_not_hasRecv(site)#still needs to exist, if a process dies and is reset (and missed some logs)
-            if len(NP) > 0:
-                message = Message(my_clock, NP).toJSON() + Communicator.DELIM
-                outgoing_sock.sendto(message.encode(), self.nodes[site])
+            m = message.toJSON() + Communicator.DELIM
+            outgoing_sock.sendto(m.encode(), self.nodes[site])
+
+        outgoing_sock.close()
+
+    ##when we want to send a single message from an acceptor back to the proposer.
+    def send_synod(self,message):
+        outgoing_sock = self.make_socket()
+        outgoing_sock.settimeout(2)
+
+        m = message.toJSON() + Communicator.DELIM
+        outgoing_sock.sendto(m.encode(), message.p)
 
         outgoing_sock.close()

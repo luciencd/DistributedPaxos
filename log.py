@@ -10,7 +10,7 @@ class Log:
     tables = {
         "Log": (
             "CREATE TABLE IF NOT EXISTS `Log` ("
-            "`timestamp` INT NOT NULL,"
+            "`index` INT NOT NULL,"
             "`site` INT NOT NULL,"
             "`op` VARCHAR(16) NOT NULL,"
             "`data` VARCHAR(144) NOT NULL,"
@@ -23,12 +23,14 @@ class Log:
             "`blocked` INT NOT NULL,"
             "PRIMARY KEY (blocker,blocked)"
         ")"),
-        "T": (
+        "Variables": (
             "CREATE TABLE IF NOT EXISTS `T`("
-            "`site` INT NOT NULL,"
-            "`knows_about` INT NOT NULL,"
-            "`timestamp` INT NOT NULL,"
-            "PRIMARY KEY (site,knows_about)"
+            "`index` INT NOT NULL,"
+            "`proposed_value` INT NOT NULL,"##will probably need to be the same variables as in the message. #or will they? as soon as accepted value is confirmed, we can just add it to the Log so why bother?
+            "`accepted_value` INT NOT NULL,"
+            "`proposed_id` INT NOT NULL,"
+            "`accepted_id` INT NOT NULL,"
+            "PRIMARY KEY (index)"
         ")")
     }
 
@@ -51,17 +53,6 @@ class Log:
     @staticmethod
     def stop():
         pass
-        #Log.cnx.close()
-
-    @staticmethod
-    def __initialize_T(cnx, nodes_count):
-        all_values = ["("+str(i)+","+str(j)+",0)"
-           for i in range(0,nodes_count,1)
-              for j in range(0,nodes_count,1)]
-        query = "INSERT OR IGNORE into T (site,knows_about,timestamp) VALUES" + (",".join(all_values))
-
-        cur = cnx.cursor()
-        results = cur.execute(query)
 
     @staticmethod
     def receive(message, sender):
@@ -166,37 +157,10 @@ class Log:
         cur = cnx.cursor()
         cur.execute(query)
 
-
-    @staticmethod
-    def __increment_clock(cnx):
-        query = "UPDATE T SET timestamp = timestamp+1 WHERE site=:me AND knows_about=:me"
-        cur = cnx.cursor()
-        results = cur.execute(query,{"me": Log.id})
-
     @staticmethod
     def create_events(results_obj):
         return [ event(site,op,data,truetime,Log.names[site],time) for time,site,op,data,truetime in results_obj ]
 
-    @staticmethod
-    def get_not_hasRecv(site):
-        cnx = sqlite3.connect(Log.DATABASE_FILE)
-        query = "SELECT Log.* FROM Log JOIN T on T.knows_about = Log.site AND T.site = :target WHERE Log.timestamp > T.timestamp"
-        cur = cnx.cursor()
-        results = cur.execute(query, { "target": site}).fetchall()
-        cnx.close()
-        return Log.create_events(results)
-
-    @staticmethod
-    def get_clock():
-        cnx = sqlite3.connect(Log.DATABASE_FILE)
-        query = "SELECT timestamp FROM T ORDER BY site,knows_about"
-        cur = cnx.cursor()
-        results = cur.execute(query)
-        ordered_results = results.fetchall()
-        cnx.close()
-        num_sites = int(sqrt(len(ordered_results))) #this should always be a perfect square, because we have a 2d vector clock
-        #since data returned row-first, we can split results to rebuild 2d array
-        return [ ordered_results[start:start+num_sites] for start in range(0,num_sites**2, num_sites)]
 
     @staticmethod
     def get_blocks():
@@ -217,3 +181,9 @@ class Log:
         results = cur.execute(query, {"self": Log.id}).fetchall()
         cnx.close()
         return Log.create_events(results)
+
+
+    @staticmethod
+    def commitPAXOSLogEntry(message):
+        #cnx = sqlite3.connect(Log.DATABASE_FILE)
+        #query = "INSERT INTO Log VALUES (:index,:site,:op,:data,:truetime) AS (index,site,op,data,truetime)"
