@@ -95,10 +95,10 @@ class Acceptor(Agent):
     def recvPrepare(self,message):
         print("Acceptor. recvPrepare()")
         print("received Proposal")
-        print("p id:",message.v.proposal_id)
-        if(message.v.proposal_id > self.storage.minProposal[message.i]):
-            self.storage.setMinProposal(message.i,message.v.proposal_id)
-            return Promise(self.storage.promised_id,message.v,message.index,self.id)
+        print("p id:",message.n)
+        if(message.n > self.storage.minProposal[message.i]):
+            self.storage.setMinProposal(message.i,message.n)
+            return Promise(self.storage.minProposal[message.i],message.v,message.index,self.id)
         else:
             return False
 
