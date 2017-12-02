@@ -1,4 +1,5 @@
 from storage import Storage
+from message import Prepare,Promise,AcceptRequest,Accepted,MessageReader,Message
 
 class Agent:
     def __init__(self,id_,N,storage):
@@ -18,7 +19,7 @@ class Proposer(Agent):
 
 
     def getProposal(self):
-        return int(str(self.storage.maxindex)+str(self.id_))
+        return int(str(self.storage.maxindex)+str(self.id))
 
 
     def sendAcceptRequest(self):
@@ -137,8 +138,11 @@ class Client:
 
     def propose_event(self,new_event):
         n = self.proposer.getProposal()
-        msg = Prepare(n,self.index,self.id)
+        msg = Prepare(n,self.storage.maxindex,self.id)
+
         print("proposing")
+        print("setting self value")
+        self.storage.setCurrentValue(self.storage.maxindex,new_event)
         self.communicator.propose(msg)
         print("proposed")
 
@@ -158,3 +162,6 @@ class Client:
     #despite the 0 process crashing
     def isLeader(self):
         return self.id == 0
+
+    def view(self):
+        return self.storage.view()

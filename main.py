@@ -96,6 +96,7 @@ def main():
     client = Client(communicator.id,communicator,Proposer(self_id,N,storage),Acceptor(self_id,N,storage),Learner(self_id,N,storage),names,storage)
 
     communicator.addClient(client)
+    print("communicator.start(self_id)")
     communicator.start(self_id)
 
 

@@ -17,10 +17,7 @@ class Communicator:
         #store an inverted lookup table where knowing an addr allows us
         #to find a node number -- this will be useful for processing socket data
         self.nodes_by_addr = dict(zip(map(lambda x:str(x[0])+str(x[1]),self.nodes), itertools.count()))
-        print("binding",binding_)
-        print("nodes",self.nodes_by_addr)
         self.id = self.nodes_by_addr.get(str(binding_[0])+str(binding_[1]))
-        print('self.id',self.id)
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
 
@@ -34,6 +31,7 @@ class Communicator:
     Launch the socket thread to begin listening for events from other sites
     '''
     def start(self, id):
+        print("Starting",id)
         self.id = id
         self.listener_thread = threading.Thread(target=self.message_listener)
         self.listener_thread.start();
@@ -72,6 +70,7 @@ class Communicator:
         self.listener = self.make_socket()
         #prepare the socket for listening
         self.listener.bind(('0.0.0.0', binding[1]))
+        print("listening")
 
         while False == self.begin_shutdown:
             try:
@@ -126,7 +125,7 @@ class Communicator:
         sites = set(range(0,len(self.nodes)))
         sites.remove(self.id)
         ##this will be a quorum of sites, all of them
-
+        print("sites",sites)
         #figure out what this does.
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
