@@ -1,4 +1,4 @@
-from storage import storage
+from storage import Storage
 
 class Agent:
     def __init__(self,id_,N,storage):
@@ -14,7 +14,7 @@ class Agent:
 ##should make these agents store their states in stable storage.
 class Proposer(Agent):
     def __init__(self,id_,N,storage):
-        super().__init__(self,id_,N,storage)
+        super().__init__(id_,N,storage)
 
 
     def getProposal(self):
@@ -68,7 +68,7 @@ class Proposer(Agent):
     def isPromiseQuorum(self):
         #find out if self.storage.getAcceptances(index) has a majority.
 
-        for i in range(self.storage.promises_received[self.index]):
+        #for i in range(self.storage.promises_received[self.index]):
 
         return True
 #learner is there to find out when a value has been chosen (by the acceptors)
@@ -81,7 +81,7 @@ class Learner(Agent):
 ##should make these agents store their states in stable storage.
 class Acceptor(Agent):
     def __init__(self,id_,N,storage):
-        super().__init__(self,id_,N,storage)
+        super().__init__(id_,N,storage)
 
     def sendPromise(self):
 
@@ -117,7 +117,7 @@ class Client:
 
         self.names = names#tells you the name of the processes, so you can print it out.
         self.storage = storage
-        self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
+        #self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
 
 
 

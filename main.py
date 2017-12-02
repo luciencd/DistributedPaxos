@@ -3,6 +3,8 @@ import os
 from udp_communicator import Communicator
 from log import Log
 from event import event, EventTypes
+from storage import Storage
+from client import Client,Proposer,Acceptor,Learner,Agent
 from datetime import datetime, date
 from dateutil import tz
 from urllib.request import urlopen
@@ -61,21 +63,41 @@ def discover_site(communicator):
             raise NotImplementedError("Running behind a non-EC2 router is not currently supported.")
     return potential_id
 
+def discover_self_ip():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.connect(("127.0.0.1", 80))
+    sock.setblocking(False)
+    ip = sock.getsockname()[0]
+    sock.close()
+    return ip
+
+
 
 
 def main():
+    own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
+    print("my port is:",own_port)
+    own_addr = discover_self_ip()
+    print("My addr is",own_addr)
+
+    own_binding = (own_addr,own_port);
 
     nodes,names = readConfig()
+    print(nodes,names)
 
-    communicator = Communicator(nodes)
+    communicator = Communicator(nodes,own_binding)
 
-    self_id = discover_site(communicator)
 
-    storage = Storage("data/static.p")
-    client = Client(communicator.id,communicator,Proposer(self.id),Acceptor(self.id),Learner(self.id),names,storage)
+    #self_id = discover_site(communicator) #for amazon
+    self_id = communicator.id #for not
+
+    N = len(nodes)
+    storage = Storage("data/static.p",len(nodes))
+    client = Client(communicator.id,communicator,Proposer(self_id,N,storage),Acceptor(self_id,N,storage),Learner(self_id,N,storage),names,storage)
 
     communicator.addClient(client)
     communicator.start(self_id)
+
 
 
 

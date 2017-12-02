@@ -164,7 +164,4 @@ class Log:
         return Log.create_events(results)
 
 
-    @staticmethod
-    def commitPAXOSLogEntry(message):
-        #cnx = sqlite3.connect(Log.DATABASE_FILE)
-        #query = "INSERT INTO Log VALUES (:index,:site,:op,:data,:truetime) AS (index,site,op,data,truetime)"
+    

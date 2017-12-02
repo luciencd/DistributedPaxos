@@ -6,18 +6,28 @@ from message import Message
 #subclass communicator into UDP communicator and TCP communicator.
 class Communicator:
     DELIM = "\n"
-    def __init__(self, nodes_):
+    def __init__(self, nodes_,binding_):
         #store the list of sites we know about
         self.nodes = nodes_
+        #print("NODES:",self.nodes)
+        #print("Node shits:",list(map(lambda x:x[0],self.nodes)))
+        #print(itertools.count())
+        #N = [i for i in range(0,len(nodes_))]#itertools.count()
+        #print(zip(map(lambda x:x[0],self.nodes), N))
         #store an inverted lookup table where knowing an addr allows us
         #to find a node number -- this will be useful for processing socket data
-        self.nodes_by_addr = dict(zip(map(lambda x:x[0],self.nodes), itertools.count()))
+        self.nodes_by_addr = dict(zip(map(lambda x:str(x[0])+str(x[1]),self.nodes), itertools.count()))
+        print("binding",binding_)
+        print("nodes",self.nodes_by_addr)
+        self.id = self.nodes_by_addr.get(str(binding_[0])+str(binding_[1]))
+        print('self.id',self.id)
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
 
         self.partial_received = {site[0]: "" for site in self.nodes}
 
-    def getClient(self,client):
+
+    def addClient(self,client):
         self.client = client
     '''
     function: start
