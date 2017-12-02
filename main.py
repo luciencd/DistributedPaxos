@@ -52,8 +52,9 @@ def discover_site(communicator):
     sock.setblocking(False)
     ip = sock.getsockname()[0]
     sock.close()
-
+    print("ip",ip)
     potential_id = communicator.nodes_by_addr.get(ip)
+    print("potential_id",potential_id)
     if potential_id == None:
         #We might be in EC2 -- try to discover public IP via their metadata API
         ip = urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").readlines()[0].decode()
