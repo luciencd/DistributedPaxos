@@ -125,14 +125,15 @@ class Client:
     #this has to be an anti-pattern
     def readMessage(self,message):
 
-        if(type(message) is Proposal):##proposal messages are interpreted by the proposal.
+        if(message.__class__.__name__ == "Proposal"):##proposal messages are interpreted by the proposal.
             self.acceptor.recvProposal(message)
-        elif(type(message) is Promise):
+        elif(message.__class__.__name__ == "Promise"):
             self.proposer.recvPromise(message)
-        elif(type(message) is AcceptRequest):
+        elif(message.__class__.__name__ == "AcceptRequest"):
             self.acceptor.recvAcceptRequest(message)
-        elif(type(message) is Accepted):
+        elif(message.__class__.__name__ == "Accepted"):
             self.proposer.recvAccepted(message)
+        
 
         ##so on.
 

@@ -1,0 +1,2 @@
+ssh -i ~/.ssh/DSA.pem.txt ubuntu@52.87.155.187
+ssh -i ~/.ssh/DSA.pem.txt ubuntu@34.238.41.27
