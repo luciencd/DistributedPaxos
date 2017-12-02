@@ -144,6 +144,6 @@ class Communicator:
         outgoing_sock.settimeout(2)
 
         m = message.toJSON() + Communicator.DELIM
-        outgoing_sock.sendto(m.encode(), message.p)
+        outgoing_sock.sendto(m.encode(), self.nodes[message.p])
 
         outgoing_sock.close()

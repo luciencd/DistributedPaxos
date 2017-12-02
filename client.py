@@ -92,13 +92,15 @@ class Acceptor(Agent):
         pass
 
 
-    def recvProposal(self,message):
+    def recvPrepare(self,message):
+        print("Acceptor. recvPrepare()")
         print("received Proposal")
-        if(message.v.proposal_id >= self.storage.get):
-            self.promised_id = message.v.proposal_id
+        print("p id:",message.v.proposal_id)
+        if(message.v.proposal_id > self.storage.minProposal[message.i]):
+            self.storage.setMinProposal(message.i,message.v.proposal_id) = message.v.proposal_id
             return Promise(self.storage.promised_id,message.v,message.index,self.id)
-        #else:
-            #return NACK, to tell the proposer, its proposal failed. #unnecessary
+        else:
+            return False
 
     def recvAcceptRequest(self,message):
         if(message.v.accepted_id >= self.storage.promised_id):
@@ -125,8 +127,10 @@ class Client:
     #this has to be an anti-pattern
     def readMessage(self,message):
         print("reading msg class name:",message.__class__.__name__)
-        if(message.__class__.__name__ == "Proposal"):##proposal messages are interpreted by the proposal.
-            self.acceptor.recvProposal(message)
+        if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
+            promise = self.acceptor.recvProposal(message)
+            if(promise != False):
+                self.communicator.send_synod(promise)
         elif(message.__class__.__name__ == "Promise"):
             self.proposer.recvPromise(message)
         elif(message.__class__.__name__ == "AcceptRequest"):
