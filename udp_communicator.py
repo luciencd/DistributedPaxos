@@ -9,11 +9,7 @@ class Communicator:
     def __init__(self, nodes_,binding_):
         #store the list of sites we know about
         self.nodes = nodes_
-        #print("NODES:",self.nodes)
-        #print("Node shits:",list(map(lambda x:x[0],self.nodes)))
-        #print(itertools.count())
-        #N = [i for i in range(0,len(nodes_))]#itertools.count()
-        #print(zip(map(lambda x:x[0],self.nodes), N))
+
         #store an inverted lookup table where knowing an addr allows us
         #to find a node number -- this will be useful for processing socket data
         self.nodes_by_addr = dict(zip(map(lambda x:str(x[0])+str(x[1]),self.nodes), itertools.count()))
@@ -77,10 +73,15 @@ class Communicator:
                 data,sender = self.listener.recvfrom(4096)
                 print("got data",data,sender)
                 sender_addr = sender[0]
+                print("sender_addr:",sender_addr)
+                print(self.nodes[self.id])
+                print(self.partial_received)
 
                 if sender_addr != self.nodes[self.id] and self.partial_received.get(sender_addr) != None: #when we send to ourselves or don't get a valid addr, we've been shut down
+
                     self.partial_received[sender_addr] = self.partial_received[sender_addr] + data.decode()
                     sender_id = self.nodes_by_addr.get(sender_addr)
+
                     if sender_id != None:
                         while Communicator.DELIM in self.partial_received[sender_addr]:
                             split = self.partial_received[sender_addr].split(Communicator.DELIM)
