@@ -137,7 +137,7 @@ class Client:
 
     def propose_event(self,new_event):
         n = self.proposer.getProposal()
-        msg = Prepare(n,self.id)
+        msg = Prepare(n,self.index,self.id)
         print("proposing")
         self.communicator.propose(msg)
         print("proposed")

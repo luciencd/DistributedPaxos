@@ -11,11 +11,10 @@ class Message:
 
 class Prepare(Message):
 
-    def __init__(self,proposalNumber,process):
+    def __init__(self,proposalNumber,index,process):
         self.msg_type = "prepare"
         self.n = proposalNumber #proposal number.
-        #self.index = index #what index are we consensusing for multi-paxos
-        ##is this actually necessary? no.
+        self.i = index
         self.p = process
 
 class Promise(Message):

@@ -17,7 +17,8 @@ class Communicator:
 
         self.partial_received = {site[0]: "" for site in self.nodes}
 
-
+    def getClient(self,client):
+        self.client = client
     '''
     function: start
     Launch the socket thread to begin listening for events from other sites
@@ -79,7 +80,7 @@ class Communicator:
                             received_message = MessageReader.fromJSON(next_msg.strip())
                             ##now we have the message object
 
-                            Client.readMessage(received_message)
+                            client.readMessage(received_message)
                             #Log.receive(message_converted, sender_id)
 
             except OSError as e:

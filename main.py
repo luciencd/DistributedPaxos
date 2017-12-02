@@ -71,10 +71,13 @@ def main():
 
     self_id = discover_site(communicator)
 
-    communicator.start(self_id)
-
     storage = Storage("data/static.p")
     client = Client(communicator.id,communicator,Proposer(self.id),Acceptor(self.id),Learner(self.id),names,storage)
+
+    communicator.addClient(client)
+    communicator.start(self_id)
+
+
 
     #Log.start(len(nodes), communicator.id, names)
 
@@ -89,9 +92,10 @@ def main():
             new_tweet = collect_tweet(self_id,now_time,names)
             client.propose_event(new_tweet)
         elif user_option =="view":
-            list_tweets = Log.view()
+            data = client.view()
             print()
-            print(*list_tweets, sep="\n\n", end = "\n\n")
+            print(data)
+            #print(*list_tweets, sep="\n\n", end = "\n\n")
 
         elif user_option =="block":
             new_block = collect_block(self_id,now_time,names)
