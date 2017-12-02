@@ -128,7 +128,7 @@ class Client:
     def readMessage(self,message):
         print("reading msg class name:",message.__class__.__name__)
         if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
-            promise = self.acceptor.recvProposal(message)
+            promise = self.acceptor.recvPrepare(message)
             if(promise != False):
                 self.communicator.send_synod(promise)
         elif(message.__class__.__name__ == "Promise"):
