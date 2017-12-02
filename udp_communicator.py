@@ -75,6 +75,7 @@ class Communicator:
         while False == self.begin_shutdown:
             try:
                 data,sender = self.listener.recvfrom(4096)
+                print("got data",data,sender)
                 sender_addr = sender[0]
 
                 if sender_addr != self.nodes[self.id] and self.partial_received.get(sender_addr) != None: #when we send to ourselves or don't get a valid addr, we've been shut down
@@ -122,15 +123,17 @@ class Communicator:
 
     ##when we want to send a message from the proposers to everyone (all nodes) (because all nodes/clients are acceptors)
     def broadcast_synod(self,message):#will send out proposals and acceptRequests to all processes.
+        print("broadcasting Synod algorithm.")
         sites = set(range(0,len(self.nodes)))
         sites.remove(self.id)
         ##this will be a quorum of sites, all of them
-        print("sites",sites)
+
         #figure out what this does.
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
         for site in sites:
             m = message.toJSON() + Communicator.DELIM
+            print("sending to:",self.nodes[site])
             outgoing_sock.sendto(m.encode(), self.nodes[site])
 
         outgoing_sock.close()
