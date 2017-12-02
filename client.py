@@ -40,7 +40,13 @@ class Proposer(Agent):
     #message is a promise request.
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
-        self.storage.setPromisesReceived(message.i,message.n)
+        #(self,index,p,n,value):
+        value = message.v
+        print("incoming value:",value)
+        if(value == None):
+            value = self.storage.current_values[index]
+        print("storing Value:",value)
+        self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
         if(self.isPromiseQuorum(message.i)):
             return True#or new message.
