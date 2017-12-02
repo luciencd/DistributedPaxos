@@ -77,7 +77,7 @@ def discover_self_ip():
 def main():
     own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
     print("my port is:",own_port)
-    own_addr = discover_self_ip()
+    own_addr = discover_site()
     print("My addr is",own_addr)
 
     own_binding = (own_addr,own_port);
