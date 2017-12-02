@@ -26,7 +26,12 @@ class Proposer(Agent):
             return self.id+1
         #return int(str(self.storage.maxindex)+str(self.id))
 
+    def isLeader(self):
+        return self.leader
 
+    #make sure the process whose chosen proposal matches his initial proposal becomes leader, and the converse for the others.
+    def setLeader(self,leaderize=False):
+        self.leader = leaderize
 
     def sendAcceptRequest(self):
         msg = AcceptRequest()
