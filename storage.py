@@ -37,8 +37,8 @@ class Storage:
             self.current_values.append(None)
 
             #acceptors
-            self.min_proposal.append(None)
-            self.accepted_proposal.append(None)
+            self.min_proposal.append(0)
+            self.accepted_proposal.append(0)
             self.accepted_value.append(None)
 
     def createNewRounds(self):

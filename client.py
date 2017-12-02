@@ -18,8 +18,13 @@ class Proposer(Agent):
         super().__init__(id_,N,storage)
 
 
-    def getProposal(self):
-        return int(str(self.storage.maxindex)+str(self.id))
+    def getProposal(self):##should work.
+        if(self.isLeader()):
+            return 0
+        else:
+            return self.id+1
+        #return int(str(self.storage.maxindex)+str(self.id))
+
 
 
     def sendAcceptRequest(self):
@@ -95,12 +100,12 @@ class Acceptor(Agent):
     def recvPrepare(self,message):
         print("Acceptor. recvPrepare()")
         print("received Proposal")
-        print("p id:",message.n)
-        if(message.n > self.storage.min_proposal[message.i]):
+        print("proposal id:",message.n)
+        if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader. 
             self.storage.setMinProposal(message.i,message.n)
-            return Promise(self.storage.min_proposal[message.i],message.v,message.index,self.id)
-        else:
-            return False
+
+        return Promise(self.storage.min_proposal[message.i],message.v,message.index,self.id)
+
 
     def recvAcceptRequest(self,message):
         if(message.v.accepted_id >= self.storage.promised_id):
@@ -121,7 +126,7 @@ class Client:
         self.names = names#tells you the name of the processes, so you can print it out.
         self.storage = storage
         #self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
-
+        self.leader = False
 
 
     #this has to be an anti-pattern
@@ -166,7 +171,7 @@ class Client:
     #right now it is 0, but later, we will use more sophisticated algorithm to ensure it works
     #despite the 0 process crashing
     def isLeader(self):
-        return self.id == 0
+        return self.leader
 
     def view(self):
         return self.storage.view()
