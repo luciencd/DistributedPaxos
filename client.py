@@ -44,7 +44,7 @@ class Proposer(Agent):
         value = message.v
         print("incoming value:",value)
         if(value == None):
-            value = self.storage.current_values[index]
+            value = self.storage.current_values[message.i]
         print("storing Value:",value)
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
