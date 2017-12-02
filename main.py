@@ -77,9 +77,6 @@ def discover_self_ip():
 
 def main():
     own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
-    print("my port is:",own_port)
-
-
 
     nodes,names = readConfig()
     print(nodes,names)
@@ -95,7 +92,7 @@ def main():
 
     N = len(nodes)
     storage = Storage("data/static.p",len(nodes))
-    client = Client(communicator.id,communicator,Proposer(self_id,N,storage),Acceptor(self_id,N,storage),Learner(self_id,N,storage),names,storage)
+    client = Client(self_id,communicator,Proposer(self_id,N,storage),Acceptor(self_id,N,storage),Learner(self_id,N,storage),names,storage)
 
     communicator.addClient(client)
     print("communicator.start(self_id)")
