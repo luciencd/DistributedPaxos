@@ -40,7 +40,7 @@ class Proposer(Agent):
     #message is a promise request.
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
-        self.storage.setPromise(message.i,message.n)
+        self.storage.setPromisesReceived(message.i,message.n)
 
         if(self.isPromiseQuorum(message.i)):
             return True#or new message.
@@ -111,7 +111,7 @@ class Acceptor(Agent):
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
 
-        return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
+        return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,message.p)
 
 
     def recvAcceptRequest(self,message):
