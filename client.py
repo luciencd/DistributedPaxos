@@ -97,7 +97,7 @@ class Acceptor(Agent):
         print("received Proposal")
         print("p id:",message.v.proposal_id)
         if(message.v.proposal_id > self.storage.minProposal[message.i]):
-            self.storage.setMinProposal(message.i,message.v.proposal_id) = message.v.proposal_id
+            self.storage.setMinProposal(message.i,message.v.proposal_id)
             return Promise(self.storage.promised_id,message.v,message.index,self.id)
         else:
             return False
