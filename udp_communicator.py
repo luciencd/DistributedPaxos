@@ -12,7 +12,7 @@ class Communicator:
 
         #store an inverted lookup table where knowing an addr allows us
         #to find a node number -- this will be useful for processing socket data
-        self.nodes_by_addr = dict(zip(map(lambda x:str(x[0])+str(x[1]),self.nodes), itertools.count()))
+        self.nodes_by_addr = dict(zip(map(lambda x:x[0],self.nodes), itertools.count()))
         #self.id = self.nodes_by_addr.get(str(binding_[0])+str(binding_[1]))
         #track a shutdown flag so the socket thread knows when to wrap up
         self.begin_shutdown = False
