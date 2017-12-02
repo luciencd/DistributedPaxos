@@ -1,7 +1,7 @@
 import itertools
 import threading
 import socket
-from message import Message,MessageReader 
+from message import Message,MessageReader
 
 #subclass communicator into UDP communicator and TCP communicator.
 class Communicator:
@@ -66,16 +66,13 @@ class Communicator:
         self.listener = self.make_socket()
         #prepare the socket for listening
         self.listener.bind(('0.0.0.0', binding[1]))
-        print("listening")
 
         while False == self.begin_shutdown:
             try:
                 data,sender = self.listener.recvfrom(4096)
-                print("got data",data,sender)
+
                 sender_addr = sender[0]
-                print("sender_addr:",sender_addr)
-                print(self.nodes[self.id])
-                print(self.partial_received)
+
 
                 if sender_addr != self.nodes[self.id] and self.partial_received.get(sender_addr) != None: #when we send to ourselves or don't get a valid addr, we've been shut down
 
@@ -86,9 +83,11 @@ class Communicator:
                         while Communicator.DELIM in self.partial_received[sender_addr]:
                             split = self.partial_received[sender_addr].split(Communicator.DELIM)
                             next_msg = split[0]
+
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
 
                             received_message = MessageReader.fromJSON(next_msg.strip())
+                            print("Message Received:",received_message.__dict__,"from:" sender_addr)
                             ##now we have the message object
 
                             client.readMessage(received_message)
