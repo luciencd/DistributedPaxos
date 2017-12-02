@@ -54,71 +54,51 @@ class Log:
     def stop():
         pass
 
+    #message should be an accept message, which pushed the total messages to a quorum.
     @staticmethod
     def receive(message, sender):
         sys.stdout.flush()
         cnx = sqlite3.connect(Log.DATABASE_FILE)
         cur = cnx.cursor()
 
-        timestamp_updates = [str((x,y,message.clock[x][y]))
-             for x in range(0,len(message.clock),1)
-               for y in range(0,len(message.clock),1)]
+        e = message.v
 
-        cur.execute("CREATE TEMP TABLE T_REMOTE (site int, knows_about int, timestamp int)")
-        cur.execute("INSERT INTO T_REMOTE (site,knows_about,timestamp) VALUES" + (",".join(timestamp_updates)))
-        cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = T.site AND T_REMOTE.knows_about = T.knows_about))")
-        cur.execute("UPDATE T SET timestamp = max(timestamp,(select timestamp from T_REMOTE where T_REMOTE.site = :sender AND T_REMOTE.knows_about = T.knows_about)) WHERE T.site = :me",
-        {"sender": sender, "me": Log.id})
-        cur.execute("DROP TABLE T_REMOTE")
+        log_update = str((message.i, e.site, e.op, e.data, e.timestamp, e.truetime))
+        cur.execute("INSERT OR REPLACE INTO Log (index, site, op, data, timestamp, truetime) VALUES" + (",".join(log_update)))
 
-        log_updates = [str((e.site, e.op, e.data, e.timestamp, e.truetime)) for e in message.events]
-        cur.execute("INSERT OR REPLACE INTO Log (site, op, data, timestamp, truetime) VALUES" + (",".join(log_updates)))
-
-        dict_new_blocks = list(filter(lambda e: e.op == EventTypes.BLOCK \
-                                  and not e.superceding_unblock_exists(message.events),
-                                  message.events))
-
-        if len(dict_new_blocks) > 0:
-            dict_block_values = [str((e.get_blocker(), e.get_blocked())) for e in dict_new_blocks]
+        #adding/removing from block table.
+        if(e.op == BLOCK):
+            dict_block_value =str((e.get_blocker(), e.get_blocked()))
             cur.execute("INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES" + ",".join(dict_block_values))
-
-        dict_new_unblocks = list(filter(lambda e: e.op == EventTypes.UNBLOCK \
-                                  and not e.superceding_block_exists(message.events),
-                                  message.events))
-
-        unblock_statement = "DELETE FROM Blocks where blocker = :blocker and blocked = :blocked"
-        for e in dict_new_unblocks:
-            cur.execute(unblock_statement, {"blocker": e.get_blocker(), "blocked": e.get_blocked()})
-
-        Log.__trim_log(cnx)
+        elif(e.op == UNBLOCK):
+            dict_unblock_value =str((e.get_blocker(), e.get_blocked()))
+            cur.execute("INSERT OR REPLACE INTO Blocks (blocker, blocked) VALUES" + ",".join(dict_unblock_values))
 
         cnx.commit()
         cnx.close()
 
-
-
     @staticmethod
-    def block(event):
+    def block(event,index):
         cnx = sqlite3.connect(Log.DATABASE_FILE)
-        Log._do_local_event(cnx, event)
+        Log._do_local_event(cnx, event,index)
         Log.__dict_add(cnx, event)
         cnx.commit()
         cnx.close()
 
 
     @staticmethod
-    def unblock(event):
+    def unblock(event,index):
         cnx = sqlite3.connect(Log.DATABASE_FILE)
-        Log._do_local_event(cnx, event)
+        Log._do_local_event(cnx, event,index)
         Log.__dict_remove(cnx, event)
         cnx.commit()
         cnx.close()
 
 
     @staticmethod
-    def tweet(event):
+    def tweet(event,index):
         cnx = sqlite3.connect(Log.DATABASE_FILE)
-        Log._do_local_event(cnx, event)
+        Log._do_local_event(cnx, event,index)
         cnx.commit()
         cnx.close()
 
@@ -126,8 +106,9 @@ class Log:
     @staticmethod
     def _do_local_event(cnx, event):
             Log.__increment_clock(cnx)
-            query = """INSERT INTO Log (timestamp, site, op, data, truetime) VALUES (
+            query = """INSERT INTO Log (index,timestamp, site, op, data, truetime) VALUES (
                (SELECT timestamp from T WHERE site=:id AND knows_about=:id),
+               :index,
                :id,
                :op,
                :body,

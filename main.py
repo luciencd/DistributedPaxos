@@ -73,9 +73,10 @@ def main():
 
     communicator.start(self_id)
 
-    client = Client(communicator.id,Proposer(self.id),Acceptor(self.id),Learner(self.id))
+    storage = Storage("static.dat")
+    client = Client(communicator.id,Proposer(self.id),Acceptor(self.id),Learner(self.id),names,storage)
 
-    Log.start(len(nodes), communicator.id, names)
+    #Log.start(len(nodes), communicator.id, names)
 
     user_option = ""
     while user_option != "quit":

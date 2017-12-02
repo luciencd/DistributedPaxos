@@ -4,6 +4,7 @@ from datetime import datetime, date
 from dateutil import tz
 from dateutil.parser import parse
 from message import *
+from storage import storage
 from event import event,EventTypes
 
 
@@ -49,25 +50,11 @@ class TestInternalMessages(unittest.TestCase):
                         promise_received.v.name == e0.name and \
                         promise_received.v.timestamp == e0.timestamp)
 
-    '''def test_accept_second_round(self):
-        #first proposal
-        now_time = datetime.utcnow().replace(tzinfo=tz.tzutc()).replace(microsecond=0).replace(tzinfo=None).strftime('%Y-%m-%d %H:%M:%S')
-        ##bug where we would never send the tweet directly after setting its time to have a timezone.
-        e0 = event(0,EventTypes.TWEET,"Sad. Bad!",now_time,"Trump",0)##apparently, now_time has to be int in order to be sent.
+    def test_crash_recover(self):
+        storage = Storage()
+        storage.setCurrentValue(0,1)
 
-        accept_request_1 = acceptRequest(0,e0,0)
-        json = accept_request_1.toJSON()
-        accept_request_received = MessageReader.fromJSON(json.strip())
-
-        self.assertEqual(accept_request_received.n, 0)
-        self.assertEqual(accept_request_received.i, 0)
-        self.assertTrue(accept_request_received.v.site == e0.site and \
-                        accept_request_received.v.op == e0.op and \
-                        accept_request_received.v.data == e0.data and \
-                        accept_request_received.v.truetime == e0.truetime and \
-                        accept_request_received.v.name == e0.name and \
-                        accept_request_received.v.timestamp == e0.timestamp)'''
-
+        print(storage.__dict__)
 
 
 

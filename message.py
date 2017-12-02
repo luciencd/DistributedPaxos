@@ -26,7 +26,7 @@ class Promise(Message):
         self.v = acceptedValue #consensus choice value (event)
         self.i = index #what index are we consensusing for multi-paxos
         self.p = process
-        
+
 class AcceptRequest(Message):
 
     def __init__(self,acceptedProposal,acceptedValue,index,process):
@@ -75,11 +75,3 @@ class MessageReader:
             raise MessageNotRecognizedError
 
         return new_msg
-
-
-'''
-#json.loads deserializes the object incorrectly
-    for row in range(0,len(dict_data.n),1):
-        dict_data.n[row] = [x[0] for x in new_msg.clock[row]]
-    new_msg.events = [event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"]) for e in new_msg.events]
-    '''

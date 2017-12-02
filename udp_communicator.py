@@ -1,7 +1,6 @@
 import itertools
 import threading
 import socket
-from log import Log
 from message import Message
 
 #subclass communicator into UDP communicator and TCP communicator.

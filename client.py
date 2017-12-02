@@ -1,44 +1,28 @@
+from storage import storage
+
 class Agent:
-    def __init__(self,id_,N):
+    def __init__(self,id_,N,storage):
         self.id = id_
         self.N = N#number of processes. index equivalent to the position.
-        self.promises_received = []
-        self.acceptances_received = []
 
-        self.initializeArrays()
-
-    def initializeArrays(self):
-        for i in range(self.N):
-            for j in range(self.N):
-                row1.append(None)
-                row2.append(None)
-
-            self.promises_received.append(row1)
-            self.acceptances_received.append(row2)
-
+        self.storage = storage
 
     def getServerID():
         return self.id
 
+
 ##should make these agents store their states in stable storage.
 class Proposer(Agent):
-    def __init__(self,id_,N):
-        super().__init__(self,id_,N)
-
-        self.highest_accepted_id = 0
-
-        ##list of promises received, which is not stored in stable storage.
-
-        #get chosen value
-
+    def __init__(self,id_,N,storage):
+        super().__init__(self,id_,N,storage)
 
 
     def getMaxRound(self):
-        #Log.getMaxRound()
+        #storage.getMaxRound()
         pass
 
-    def setMaxRound(self):#reference the Log to maintain safe storage on change.
-        #Log.setMaxRound()
+    def setMaxRound(self):#reference the storage to maintain safe storage on change.
+        #storage.setMaxRound()
         pass
 
 
@@ -52,28 +36,47 @@ class Proposer(Agent):
 
     #message is a promise request.
     def recvPromise(self,message):
-        if(message)
-        pass
+        #if setpromise breaks, return exception.
+        self.storage.setPromise(message.i,message.n)
+
+        if(self.isPromiseQuorum(message.i)):
+
+
+            return True#or new message.
+        else:
+
+            return False
 
     def recvAccepted(self,message):
         #If failed to get majority or contradiction of consensus.
         #create new proposal
 
-        if(message != self.value):
-            self.setMaxRound(self.getMaxRound()+1)
-            #return sendProposal() #fail!
-        else:
+        self.storage.setAcceptance(message.i,message.p,message.n)
 
-            if()
+        if(self.isAcceptedQuorum(message.i)):
             #When the Proposal gets N/2 + 1 Acceptances.
             if(message.v.op == "tweet"):
-                tweet(message.v)
+                #unsure if message.i is necessary or self.i
+                self.storage.tweet(message.i,message.v)
             elif(message.v.op == "block"):
-                block(message.v)
+                self.storage.block(message.i,message.v)
             elif(message.v.op == "unblock"):
-                unblock(message.v)
+                self.storage.unblock(message.i,message.v)
+
+            return True
+            #return sendProposal() #fail!
+        else:
+            self.storage.setChosenMaxProposal(self.storage.getChosenMaxProposal()+1)
+            return False
 
 
+    def isAcceptedQuorum(self):
+        #find out if self.storage.getAcceptances(index) has a majority.
+        return True
+
+    def isPromiseQuorum(self):
+        #find out if self.storage.getAcceptances(index) has a majority.
+        return True
 #learner is there to find out when a value has been chosen (by the acceptors)
 #and to broadcast that knowledge to all the proposers/clients,
 #so that they do not have to keep sending proposals for no reason
@@ -83,10 +86,8 @@ class Learner(Agent):
 
 ##should make these agents store their states in stable storage.
 class Acceptor(Agent):
-    def __init__(self,id_,N):
-        super().__init__(self,id_,N)
-        self.promised_id = 0
-
+    def __init__(self,id_,N,storage):
+        super().__init__(self,id_,N,storage)
 
     def sendPromise(self):
 
@@ -98,20 +99,19 @@ class Acceptor(Agent):
 
     def recvProposal(self,message):
 
-        if(message.v.proposal_id >= self.promised_id):
+        if(message.v.proposal_id >= self.storage.get):
             self.promised_id = message.v.proposal_id
-            return Promise(self.promised_id,message.v,message.index,self.id)
+            return Promise(self.storage.promised_id,message.v,message.index,self.id)
         #else:
-            #return NACK, to tell the proposer, its proposal failed.
-
+            #return NACK, to tell the proposer, its proposal failed. #unnecessary
 
     def recvAcceptRequest(self,message):
-        if(message.v.accepted_id >= self.promised_id):
+        if(message.v.accepted_id >= self.storage.promised_id):
             self.promised_id
 
 
 class Client:
-    def __init__(self, proposer, acceptor, learner):
+    def __init__(self, proposer, acceptor, learner,names,storage):
         self.id = id_
         self.proposer = proposer
         self.acceptor = acceptor # Acceptor(self.id)
@@ -119,6 +119,11 @@ class Client:
         #this class references the Log,
         #and encapsulates the proposer, learner and acceptor agents.
         self.event_queue = []
+
+
+        self.names = names#tells you the name of the processes, so you can print it out.
+        self.storage = storage
+        self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
 
 
 
@@ -136,39 +141,16 @@ class Client:
 
         ##so on.
 
-    def tweet(self,new_tweet):
-        self.event_queue.append(new_tweet)
-        #add to queue of proposals you want accepted (ordered) (in memory)
-
-    def block(self,new_block):
-        self.event_queue.append(new_block)
-        #add to queue of proposals you want accepted (ordered) (in memory)
-
-    def unblock(self,new_unblock):
-        self.event_queue.append(new_unblock)
-        #add to queue of proposals you want accepted (ordered) (in_memory)
+    def propose_event(self,new_event):
+        self.proposer.create_proposal(new_event)
 
 
-    ########COMMITTING
-    #once your event reaches consensus among all other processes,
-    # i.e. the proposer learns a majority, or the learner tells you they learned the majority, then
-    # commit to Log!
-    def event_at_index_commit(self,event):
-        if(event.name)
-        Log.tweet(new_tweet)
-        #communicator.tweet()#just sends all messages that have not been recieved by the particular other clients.
-        #could be single tweet, single block, single unblock, as long as all the events
-        #in there have been the result of consensus. Which they are, as any event in the log has been reached by consensus!!!
+    def crashRecover(self):
 
-    def block_for_real(self,new_block):
-        Log.block(new_block)
-        #communicator.tweet()#just sends all messages that have not been recieved by the particular other clients.
-        #could be single tweet, single block, single unblock
+        #first, messages from static storage must be recreated.
+        self.storage.recover()
 
-    def unblock_for_real(self,new_unblock):
-        Log.unblock(new_unblock)
-        #communicator.tweet()#just sends all messages that have not been recieved by the particular other clients.
-        #could be single tweet, single block, single unblock
+        #contact learners to see what messages have not been received.
 
     #########COMMITTING
 
