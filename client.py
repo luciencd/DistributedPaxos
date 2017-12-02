@@ -43,6 +43,7 @@ class Proposer(Agent):
         #(self,index,p,n,value):
         value = message.v
         print("incoming value:",value)
+        print(message.i)
         if(value == None):
             value = self.storage.current_values[message.i]
         print("storing Value:",value)
