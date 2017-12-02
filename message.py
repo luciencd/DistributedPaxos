@@ -52,7 +52,7 @@ class MessageReader:
         dict_data = json.loads(payload)
 
         if(dict_data["msg_type"] == "prepare"):
-            new_msg = Prepare(dict_data["n"],dict_data["p"])
+            new_msg = Prepare(dict_data["n"],dict_data["i"],dict_data["p"])
         elif(dict_data["msg_type"] == "promise"):
             e = dict_data["v"]
             if(e != None):
