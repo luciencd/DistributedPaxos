@@ -87,7 +87,7 @@ class Learner(Agent):
 
 ##should make these agents store their states in stable storage.
 class Acceptor(Agent):
-    def __init__(self,id_,N,storage,client):
+    def __init__(self,id_,N,storage):
         super().__init__(id_,N,storage)
 
     def sendPromise(self):
