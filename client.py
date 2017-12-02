@@ -16,6 +16,7 @@ class Agent:
 class Proposer(Agent):
     def __init__(self,id_,N,storage):
         super().__init__(id_,N,storage)
+        self.leader = False
 
 
     def getProposal(self):##should work.
@@ -86,7 +87,7 @@ class Learner(Agent):
 
 ##should make these agents store their states in stable storage.
 class Acceptor(Agent):
-    def __init__(self,id_,N,storage):
+    def __init__(self,id_,N,storage,client):
         super().__init__(id_,N,storage)
 
     def sendPromise(self):
@@ -101,7 +102,7 @@ class Acceptor(Agent):
         print("Acceptor. recvPrepare()")
         print("received Proposal")
         print("proposal id:",message.n)
-        if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader. 
+        if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
 
         return Promise(self.storage.min_proposal[message.i],message.v,message.index,self.id)
@@ -126,7 +127,7 @@ class Client:
         self.names = names#tells you the name of the processes, so you can print it out.
         self.storage = storage
         #self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
-        self.leader = False
+
 
 
     #this has to be an anti-pattern
@@ -170,8 +171,7 @@ class Client:
     #these are to let you know if you are the leader.
     #right now it is 0, but later, we will use more sophisticated algorithm to ensure it works
     #despite the 0 process crashing
-    def isLeader(self):
-        return self.leader
+
 
     def view(self):
         return self.storage.view()
