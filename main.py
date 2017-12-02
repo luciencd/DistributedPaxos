@@ -73,8 +73,8 @@ def main():
 
     communicator.start(self_id)
 
-    storage = Storage("static.dat")
-    client = Client(communicator.id,Proposer(self.id),Acceptor(self.id),Learner(self.id),names,storage)
+    storage = Storage("data/static.p")
+    client = Client(communicator.id,communicator,Proposer(self.id),Acceptor(self.id),Learner(self.id),names,storage)
 
     #Log.start(len(nodes), communicator.id, names)
 
@@ -87,13 +87,7 @@ def main():
 
         if user_option == "tweet":
             new_tweet = collect_tweet(self_id,now_time,names)
-
-            #don't add to log until you reach consensus and the tweet is chosen.
-            client.tweet(new_tweet)
-
-            #Log.tweet(new_tweet)
-            #communicator.tweet()
-
+            client.propose_event(new_tweet)
         elif user_option =="view":
             list_tweets = Log.view()
             print()
@@ -101,21 +95,16 @@ def main():
 
         elif user_option =="block":
             new_block = collect_block(self_id,now_time,names)
-
-            #don't add to log until you reach consensus and the tweet is chosen.
             if new_block != None:
-                client.block(new_block)
-                #Log.block(new_block)
+                client.propose_event(new_block)
+
             else:
                 print("Invalid block, doing nothing.")
 
         elif user_option =="unblock":
             new_unblock = collect_unblock(self_id,now_time,names)
-
-            #don't add to log until you reach consensus and the tweet is chosen.
             if new_unblock != None:
-                client.unblock(new_unblock)
-                #Log.unblock(new_unblock)
+                client.propose_event(new_unblock)
             else:
                 print("Invalid unblock, doing nothing.")
 
