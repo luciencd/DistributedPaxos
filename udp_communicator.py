@@ -87,7 +87,7 @@ class Communicator:
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
 
                             received_message = MessageReader.fromJSON(next_msg.strip())
-                            print("Message Received:",received_message.__dict__,"from:" sender_addr)
+                            print("Message Received:",received_message.__dict__,"from:",sender_addr)
                             ##now we have the message object
 
                             client.readMessage(received_message)
