@@ -165,3 +165,6 @@ class Client:
 
     def view(self):
         return self.storage.view()
+
+    def erase(self):
+        self.storage.erase()

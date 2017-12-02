@@ -1,7 +1,7 @@
 import itertools
 import threading
 import socket
-from message import Message
+from message import Message,MessageReader 
 
 #subclass communicator into UDP communicator and TCP communicator.
 class Communicator:

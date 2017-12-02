@@ -136,6 +136,9 @@ def main():
 
         elif user_option == "name":
             print("My name is:",communicator.name)
+        elif user_option == "erase":
+            print("Erasing all data (must do on all nodes!!!)")
+            client.erase()
 
         elif user_option =="quit":
             print("Shutting down...")
