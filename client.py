@@ -94,9 +94,9 @@ class Acceptor(Agent):
 
     def recvProposal(self,message):
         print("received Proposal")
-        '''if(message.v.proposal_id >= self.storage.get):
+        if(message.v.proposal_id >= self.storage.get):
             self.promised_id = message.v.proposal_id
-            return Promise(self.storage.promised_id,message.v,message.index,self.id)'''
+            return Promise(self.storage.promised_id,message.v,message.index,self.id)
         #else:
             #return NACK, to tell the proposer, its proposal failed. #unnecessary
 
@@ -124,7 +124,7 @@ class Client:
 
     #this has to be an anti-pattern
     def readMessage(self,message):
-
+        print("reading msg class name:",message.__class__.__name__)
         if(message.__class__.__name__ == "Proposal"):##proposal messages are interpreted by the proposal.
             self.acceptor.recvProposal(message)
         elif(message.__class__.__name__ == "Promise"):
@@ -133,7 +133,7 @@ class Client:
             self.acceptor.recvAcceptRequest(message)
         elif(message.__class__.__name__ == "Accepted"):
             self.proposer.recvAccepted(message)
-        
+
 
         ##so on.
 
