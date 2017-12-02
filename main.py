@@ -77,19 +77,20 @@ def discover_self_ip():
 def main():
     own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
     print("my port is:",own_port)
-    own_addr = discover_site()
-    print("My addr is",own_addr)
 
-    own_binding = (own_addr,own_port);
+
 
     nodes,names = readConfig()
     print(nodes,names)
 
-    communicator = Communicator(nodes,own_binding)
+    communicator = Communicator(nodes)
+    self_id = discover_site(communicator)
+    print("My addr is",self_id)
+
 
 
     #self_id = discover_site(communicator) #for amazon
-    self_id = communicator.id #for not
+    #self_id = communicator.id #for not
 
     N = len(nodes)
     storage = Storage("data/static.p",len(nodes))
