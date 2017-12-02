@@ -44,9 +44,10 @@ class Proposer(Agent):
         value = message.v
         print("incoming value:",value)
         print(message.i)
+
         if(value == None):
             value = self.storage.current_values[message.i]
-        print("storing Value:",value)
+        print("storing Value:",value.data)
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
         if(self.isPromiseQuorum(message.i)):
