@@ -90,7 +90,7 @@ class Communicator:
                             print("Message Received:",received_message.__dict__,"from:",sender_addr)
                             ##now we have the message object
 
-                            client.readMessage(received_message)
+                            self.client.readMessage(received_message)
                             #Log.receive(message_converted, sender_id)
 
             except OSError as e:
