@@ -107,10 +107,11 @@ class Acceptor(Agent):
         print("Acceptor. recvPrepare()")
         print("received Proposal")
         print("proposal id:",message.n)
+        #figure out what leader should send. if its 0, that's not gonna work right.
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
 
-        return Promise(self.storage.min_proposal[message.i],message.v,message.index,self.id)
+        return Promise(self.storage.min_proposal[message.i],self.storage.acceptedValue[message.i],message.i,self.id)
 
 
     def recvAcceptRequest(self,message):
