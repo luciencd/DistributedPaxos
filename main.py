@@ -130,6 +130,7 @@ def main():
         elif user_option =="block":
             new_block = collect_block(self_id,now_time,names)
             if new_block != None:
+                
                 client.twitterEvent(new_block)
 
             else:

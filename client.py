@@ -244,6 +244,7 @@ class Client:
             proposal = self.propose_event(new_event,self.storage.maxindex)
             #print("PROPOSAL: ",proposal)
         else:
+            self.storage.setRound(self.storage.maxindex+1)
             return False
 
 
