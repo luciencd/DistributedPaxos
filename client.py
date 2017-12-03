@@ -274,6 +274,7 @@ class Client:
         self.storage.commitEvent(message.i,message.v)
 
         #blocks and
+        print("block?",message.v.op,(message.v.get_blocker(),message.v.get_blocked()))
         if(message.v.op == "block"):
             self.block_dictionary[(message.v.get_blocker(),message.v.get_blocked())] = True
         elif(message.v.op == "unblock"):
