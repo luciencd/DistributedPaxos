@@ -37,6 +37,14 @@ class Proposer(Agent):
         msg = AcceptRequest()
         pass
 
+    def highest_value_of_proposals(self):
+        max_proposal = 0
+        max_value = None
+        for key, value in counts.items():
+            if(key > max_proposal):
+                max_value = value[2]
+
+        return max_value
     #message is a promise request.
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
@@ -50,11 +58,19 @@ class Proposer(Agent):
         else:
             value = message.v
         print("storing own Value:",value.data)
+        print(self.storage.current_values[message.i])
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
         print("now we have this values at index.",self.storage.current_values[message.i].data)
         print("with these proposals:",self.storage.promises_received[message.i])
+
         if(self.isPromiseQuorum(message.i)>=0):
-            return True#or new message.
+            #counts = self.getTotalCounts(index)
+            high_value = self.highest_value_of_proposals()
+            self.storage.setCurrentValue(message.i,high_value)
+            #find the highest proposal number and create an acceptedRequest with it
+            acc = AcceptRequest(self.proposal.getProposal(),self.storage.current_values[message.i],message.i,self.id)#or new message.
+            print(acc)
+            return acc
         else:
             return False
 
@@ -90,7 +106,7 @@ class Proposer(Agent):
         self.storage.acceptances_received
         return True
 
-    def isPromiseQuorum(self,index):
+    def getTotalCounts(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.
         print(self.storage.promises_received[index])
         counts = dict()
@@ -109,7 +125,10 @@ class Proposer(Agent):
                     counts[None] = (counts[promise_number][0]+1,None,None)
                 else:
                     counts[None] = (1,None,None)
+        return counts
 
+    def isPromiseQuorum(self,index):
+        counts = self.getTotalCounts(index)
         for key, value in counts.items():
             if(value[0] > self.numProcesses()//2):
                 print("QUROUM reached! accept proposal",value[1],"tweet",value[2].data)
@@ -183,7 +202,8 @@ class Client:
             accept_request = self.proposer.recvPromise(message)
             if(accept_request != False):
                 print("gonna send out accept request! for message value")
-                #self.communicator.broadcast_synod(accept_request)
+                print(accept_request)
+                self.communicator.broadcast_synod(accept_request)
         elif(message.__class__.__name__ == "AcceptRequest"):
             self.acceptor.recvAcceptRequest(message)
         elif(message.__class__.__name__ == "Accepted"):
