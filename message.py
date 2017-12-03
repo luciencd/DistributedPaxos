@@ -87,9 +87,9 @@ class MessageReader:
             e = dict_data["v"]
             if(e != None):
                 v = event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"])
-                new_msg = Commit(dict_data["n"],v,dict_data["i"],dict_data["p"])
+                new_msg = Commit(v,dict_data["i"],dict_data["p"])
             else:
-                new_msg = Commit(dict_data["n"],None,dict_data["i"],dict_data["p"])
+                new_msg = Commit(None,dict_data["i"],dict_data["p"])
         else:
             raise MessageNotRecognizedError
 
