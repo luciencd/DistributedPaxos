@@ -16,6 +16,8 @@ class Storage:
         self.accepted_proposal = []
         self.accepted_value = []
 
+        self.event_list = []
+        
         self.initializeArrays()
         self.recoverFromFile(self.filename)
         self.commit()
@@ -41,6 +43,7 @@ class Storage:
             self.accepted_proposal.append(0)
             self.accepted_value.append(None)
 
+            self.event_list.append(None)
     def createNewRounds(self):
         for i in range(len(self.promises_received),self.maxindex+1):
             row1 = []
