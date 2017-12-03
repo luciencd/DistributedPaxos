@@ -59,5 +59,7 @@ class event:
     def __str__(self):
         #solved bug, by automattically appending utc timezone
         print("trying to print event",self.truetime)
-        localtime = parse(self.truetime).replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+        print("string:",parse(str(self.truetime)))
+        localtime = parse(str(self.truetime)).replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+        print("localtime:",localtime)
         return "{} by {} at {}:\n   {}".format(self.op.title(),self.name,localtime.strftime('%Y-%m-%d %H:%M:%S'),self.data)
