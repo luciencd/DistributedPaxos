@@ -240,7 +240,7 @@ class Client:
 
     def commit(self,message):
         print("COMMIT")
-        self.log_dict[message.i] = message.v
+        self.storage.commitEvent(message.i,message.v)
 
         #blocks and
         if(message.v.op == "block"):
@@ -271,8 +271,8 @@ class Client:
     def view(self):
         tweets_list_string = []
 
-        log = self.storage.event_list
-        for event in log:
+        for event in self.storage.event_list:
+            print("EVENT ",event)
             if(event == None):
                 tweets_list_string.append("EMPTY LOG ENTRY")
             if(event.op == "tweet"):
