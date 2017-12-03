@@ -112,7 +112,7 @@ class Proposer(Agent):
 
         for key, value in counts.items():
             if(value[0] > self.numProcesses()//2):
-                print("QUROUM reached! accept proposal",value[1],"tweet",value[2])
+                print("QUROUM reached! accept proposal",value[1],"tweet",value[2].data)
                 return value[1]
             else:
                 print("not a quorum for proposal",value[1])
