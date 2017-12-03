@@ -21,9 +21,9 @@ class Proposer(Agent):
 
     def getProposal(self):##should work.
         if(self.isLeader()):
-            return 0
+            return self.N
         else:
-            return self.id+1
+            return self.id
         #return int(str(self.storage.maxindex)+str(self.id))
 
     def isLeader(self):
