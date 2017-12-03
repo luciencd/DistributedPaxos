@@ -1,5 +1,6 @@
 from storage import Storage
 from message import Prepare,Promise,AcceptRequest,Accepted,MessageReader,Message
+import json
 
 class Agent:
     def __init__(self,id_,N,storage):
@@ -78,7 +79,7 @@ class Proposer(Agent):
 
         if(self.isAcceptedQuorum(message.i)):
             print("MESSAGE COMMITTING:",message.v,type(message.v))
-            print("MESSAGE dict",message.v.op)
+            #print("MESSAGE dict",message.v.op)
             #When the Proposal gets N/2 + 1 Acceptances.
 
                 #unsure if message.i is necessary or self.i
@@ -279,27 +280,21 @@ class Client:
     def view(self):
         tweets_list_string = []
 
-        for event in self.storage.event_list:
-            print("EVENT ",event)
+        for i in range(self.maxindex):#self.storage.event_list:
+            event = self.storage.event_list[i]
             if(event == None):
                 tweets_list_string.append("EMPTY LOG ENTRY")
             elif(event.op == "tweet"):
                 if(not self.isBlocked(event.site)):
                     tweets_list_string.append(event.__str__())
-        print("list: ",tweets_list_string)
+        
         return "\n".join(tweets_list_string)
-
-
 
 
     #showing the internal stable state.
     def data(self):
-        data = self.storage.view()
-
-        #d_string += ","
-
         #make prettier.
-        return json.dumps(data, indent=4, sort_keys=True)
+        return json.dumps(self.storage.view(), indent=4, sort_keys=True)
 
     #incase we want to reset everything on all nodes to revert without messing with indiviudal files.
     def erase(self):
