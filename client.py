@@ -46,12 +46,12 @@ class Proposer(Agent):
         print(message.i)
 
         if(value == None):
-            value = self.storage.current_values[message.i][self.id]
+            value = self.storage.current_values[message.i]
         else:
             value = message.v
         print("storing own Value:",value)
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
-        print("now we have these values at index.",self.storage.current_values[message.i])
+        print("now we have this values at index.",self.storage.current_values[message.i])
         print("with these proposals:",self.storage.promises_received[message.i])
         if(self.isPromiseQuorum(message.i)>=0):
             return True#or new message.
