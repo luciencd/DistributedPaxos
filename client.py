@@ -77,6 +77,8 @@ class Proposer(Agent):
         self.storage.setAcceptancesReceived(message.i,message.p,message.n)
 
         if(self.isAcceptedQuorum(message.i)):
+            print("MESSAGE COMMITTING:",message.v,type(message.v))
+            print("MESSAGE dict",message.v.op)
             #When the Proposal gets N/2 + 1 Acceptances.
             if(message.v.op == "tweet"):
                 #unsure if message.i is necessary or self.i
@@ -102,7 +104,6 @@ class Proposer(Agent):
         for i in range(len(self.storage.acceptances_received[index])):
             if(self.storage.acceptances_received[index][i] != None):
                 maj += 1
-        print("count processes",maj)
         return maj >= (len(self.storage.acceptances_received[index])//2 + 1)
 
     def getTotalCounts(self,index):
