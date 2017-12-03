@@ -81,7 +81,7 @@ class Proposer(Agent):
             return False
 
     def numProcesses(self):
-        return len(self.storage.current_values[0])
+        return len(self.storage.promises_received[0])
 
     def isAcceptedQuorum(self):
         #find out if self.storage.getAcceptances(index) has a majority.
