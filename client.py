@@ -183,7 +183,8 @@ class Client:
         self.storage = storage
         #self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
 
-        self.log_dict = {}
+        self.block_dictionary = {}
+
 
     #this has to be an anti-pattern
     def readMessage(self,message):
