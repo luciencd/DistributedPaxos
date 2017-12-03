@@ -30,7 +30,7 @@ def collect_tweet(site,now_time,names):
 
     e = event(site, EventTypes.TWEET, tweet_text,now_time,names[site])
     print("EVENT CREATION:",e)
-    print(site,EventTypes.TWEET, tweet_text,now_time
+    print(site,EventTypes.TWEET, tweet_text,now_time)
     print("names:",names[site])
     print("\n")
 
