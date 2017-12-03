@@ -83,6 +83,7 @@ def main():
 
     communicator = Communicator(nodes)
     self_id = discover_site(communicator)
+    communicator.name = names[self_id]
     print("My addr is",self_id)
 
 
