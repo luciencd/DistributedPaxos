@@ -28,7 +28,11 @@ def readConfig():
 def collect_tweet(site,now_time,names):
     tweet_text = input("Enter your tweet: ")
 
-    return event(site, EventTypes.TWEET, tweet_text,now_time,names[site])
+    e = event(site, EventTypes.TWEET, tweet_text,now_time,names[site])
+    print("EVENT CREATION:",e)
+    print(site,EventTypes.TWEET, tweet_text,now_time
+    print("names:",names[site])
+    print("\n")
 
 def collect_block(site,now_time,names):
     blocked_text = input("Enter your block: ")
@@ -115,6 +119,7 @@ def main():
 
         if user_option == "tweet":
             new_tweet = collect_tweet(self_id,now_time,names)
+            print("main view new_Tweet",new_tweet)
             client.twitterEvent(new_tweet)
         elif user_option =="view":
             data = client.view()
