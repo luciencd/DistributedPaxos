@@ -102,7 +102,7 @@ class Proposer(Agent):
         for i in range(len(self.storage.acceptances_received[index])):
             if(self.storage.acceptances_received[index][i] != None):
                 maj += 1
-        #print("count processes",maj)
+        print("count processes",maj)
         return maj > (len(self.storage.acceptances_received[index])//2 + 1)
 
     def getTotalCounts(self,index):
