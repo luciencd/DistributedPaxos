@@ -53,7 +53,7 @@ class Proposer(Agent):
 
         if(value == None):
             value = self.storage.current_values[message.i]
-            print("value at index",i,value)
+            print("value at index",message.i,value)
         else:
             value = message.v
 
