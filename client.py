@@ -100,7 +100,7 @@ class Proposer(Agent):
         for i in range(len(self.storage.acceptances_received[index])):
             if(self.storage.acceptances_received[index][i] != None):
                 maj += 1
-        return maj >= (len(self.storage.acceptances_received[index])//2 + 1)
+        return maj == (len(self.storage.acceptances_received[index])//2 + 1)
 
     def getTotalCounts(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.
@@ -126,7 +126,7 @@ class Proposer(Agent):
     def isPromiseQuorum(self,index):
         counts = self.getTotalCounts(index)
         for key, value in counts.items():
-            if(value[0] > self.numProcesses()//2):
+            if(value[0] == self.numProcesses()//2 + 1):
                 print("QUROUM reached! accept proposal",value[1],"tweet",value[2].data)
                 return value[1]
             else:
@@ -220,7 +220,11 @@ class Client:
 
         ##so on.
     def twitterEvent(self,new_event):#make sure maxindex is in storage and what that means.
-        self.propose_event(new_event,self.storage.maxindex)
+        if(self.storage[self.storage.maxindex] == None):
+            self.propose_event(new_event,self.storage.maxindex)
+        else:
+            return False
+
 
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
@@ -242,12 +246,15 @@ class Client:
     def commit(self,message):
         print("COMMIT")
         self.storage.commitEvent(message.i,message.v)
+        self.storage.setRound(self.storage.maxindex+1)
 
         #blocks and
         if(message.v.op == "block"):
             self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = True
         elif(message.v.op == "unblock"):
             self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = False
+
+        ##increment round size.
 
     def crashRecover(self):
 
@@ -264,7 +271,7 @@ class Client:
 
     def isBlocked(self,other_site):
         try:
-            return self.block_dictionary[(self.id,other_site)]
+            return self.block_dictionary[(other_site,self.id)]
         except KeyError:
             return False
 
@@ -288,8 +295,11 @@ class Client:
     #showing the internal stable state.
     def data(self):
         data = self.storage.view()
+
+        #d_string += ","
+
         #make prettier.
-        return data
+        return json.dumps(data, indent=4, sort_keys=True)
 
     #incase we want to reset everything on all nodes to revert without messing with indiviudal files.
     def erase(self):

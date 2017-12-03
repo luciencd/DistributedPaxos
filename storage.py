@@ -2,10 +2,11 @@ import pickle
 import os
 
 class Storage:
-    def __init__(self, filename, N,maxindex=1):
+    def __init__(self, filename, N,maxindex=0,initStorage = 10):
         self.filename = filename
         self.maxindex = maxindex
         self.N = N
+        self.initStorage = initStorage
 
         self.promises_received = []
         self.acceptances_received = []
@@ -17,14 +18,14 @@ class Storage:
         self.accepted_value = []
 
         self.event_list = []
-        
+
         self.initializeArrays()
         self.recoverFromFile(self.filename)
         self.commit()
 
 
     def initializeArrays(self):
-        for i in range(self.maxindex+1):
+        for i in range(0,self.initStorage):#self.maxindex):
             row1 = []
             row2 = []
             for j in range(self.N):
@@ -34,7 +35,7 @@ class Storage:
             self.promises_received.append(row1)
             self.acceptances_received.append(row2)
 
-        for i in range(self.maxindex+1):
+        for i in range(0,self.initStorage):#self.maxindex):
             #proposers
             self.current_values.append(None)
 
@@ -44,8 +45,9 @@ class Storage:
             self.accepted_value.append(None)
 
             self.event_list.append(None)
+
     def createNewRounds(self):
-        for i in range(len(self.promises_received),self.maxindex+1):
+        for i in range(len(self.promises_received),self.maxindex):
             row1 = []
             row2 = []
             for j in range(self.N):
@@ -55,7 +57,7 @@ class Storage:
             self.promises_received.append(row1)
             self.acceptances_received.append(row2)
 
-        for i in range(len(self.min_proposal),self.maxindex+1):
+        for i in range(len(self.min_proposal),self.maxindex):
             #proposers
             self.current_values.append(None)
 
@@ -73,31 +75,43 @@ class Storage:
         self.maxindex = round_
         self.commit()
 
+    def maxIndexise(self,index):
+        if(index > self.maxindex):
+            createNewRounds()
+        self.commit()
+
     def setPromisesReceived(self,index,p,n,value):
+        #self.maxIndexise(index)
         self.promises_received[index][p] = (n,value)
         self.commit()
 
     def setAcceptancesReceived(self,index,p,n):
+        #self.maxIndexise(index)
         self.acceptances_received[index][p] = n
         self.commit()
 
     def setCurrentValue(self,index,value):
+        #self.maxIndexise(index)
         self.current_values[index] = value
         self.commit()
 
     def setMinProposal(self,index,n):
+        #self.maxIndexise(index)
         self.min_proposal[index] = n
         self.commit()
 
     def setAcceptedProposal(self,index,n):
+        #self.maxIndexise(index)
         self.accepted_proposal[index] = n
         self.commit()
 
     def setAcceptedValue(self,index,value):
+        #self.maxIndexise(index)
         self.accepted_value[index] = value
         self.commit()
 
     def commitEvent(self,index,event):
+        #self.maxIndexise(index)
         self.event_list[index] = event
         self.commit()
 
