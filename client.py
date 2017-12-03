@@ -101,12 +101,15 @@ class Proposer(Agent):
     def numProcesses(self):
         return len(self.storage.promises_received[0])
 
-    def isAcceptedQuorum(self):
+    def isAcceptedQuorum(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.
         #no editing of anything
-
-        self.storage.acceptances_received
-        return True
+        maj = 0
+        for i in range(len(self.storage.acceptances_received[index])):
+            if(self.storage.acceptances_received[index][i] != None):
+                maj += 1
+        print("count processes",maj)
+        return maj > (len(self.storage.acceptances_received[index])//2 + 1)
 
     def getTotalCounts(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.

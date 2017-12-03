@@ -37,11 +37,12 @@ class AcceptRequest(Message):
 
 class Accepted(Message):
 
-    def __init__(self,minProposal,index,process):
+    def __init__(self,minProposal,acceptedValue,index,process):
         self.msg_type = "accepted"
         self.n = minProposal
         self.i = index
         self.p = process
+        self.v = acceptedValue
         #unsure if we need to include value v... if proposer(n) can't be < n, and if it is greater than proposer(n), the proposer failed
         ##and if it is equal, the proposer(n), already knows its own value
 
