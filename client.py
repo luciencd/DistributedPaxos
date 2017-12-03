@@ -265,7 +265,7 @@ class Client:
         return self.log_dict
 
     #showing the internal stable state.
-    def datadump(self):
+    def data(self):
         data = self.storage.view()
         #make prettier.
         return data
