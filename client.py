@@ -37,7 +37,7 @@ class Proposer(Agent):
 
     def highest_value_of_proposals(self,index):
         counts = self.getTotalCounts(index)
-        max_proposal = 0
+        max_proposal = -1
         max_value = None
         for key, value in counts.items():
             if(key > max_proposal):
