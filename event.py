@@ -15,7 +15,7 @@ class event:
         self.data = body
         self.timestamp = timestamp
         #when constructing this, assume the tweet's time is in UTC, and should be converted in the __str__ "view"
-        self.truetime = truetime
+        self.truetime = str(truetime)
         self.name = name
 
     def get_tweet(self):

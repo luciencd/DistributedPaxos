@@ -126,6 +126,7 @@ class Communicator:
     ##when we want to send a message from the proposers to everyone (all nodes) (because all nodes/clients are acceptors)
     def broadcast_synod(self,message):#will send out proposals and acceptRequests to all processes.
         print("broadcasting Synod algorithm.")
+        print("JSON OF MESSAGE:",message.toJSON())
         sites = set(range(0,len(self.nodes)))
         sites.remove(self.id)
         ##this will be a quorum of sites, all of them
