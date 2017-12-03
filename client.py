@@ -179,7 +179,7 @@ class Acceptor(Agent):
             self.storage.setMinProposal(message.i,message.n)
             self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
             self.storage.setAcceptedValue(message.i,message.v)
-            return Accepted(self.storage.min_proposal[message.i],message.i,self.id)
+            return Accepted(self.storage.min_proposal[message.i],message.v,message.i,self.id)
 
         else:
             #don't think I need to do anything, although I could send a Nack.
