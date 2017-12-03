@@ -1,5 +1,5 @@
 from storage import Storage
-from message import Prepare,Promise,AcceptRequest,Accepted,MessageReader,Message
+from message import Prepare,Promise,AcceptRequest,Accepted,MessageReader,Message,Commit
 import json
 
 class Agent:
@@ -215,14 +215,27 @@ class Client:
 
         elif(message.__class__.__name__ == "Accepted"):
             commit_bool = self.proposer.recvAccepted(message)
-            if(commit_bool):
+            if(commit_bool):#if you have a perfect accept quorum (1ce for all indices)
                 self.commit(message)
+                #only after you yourself are committing, not getting a commit from somewhere else.
+                self.storage.setRound(self.storage.maxindex+1)
+
+
+        elif(message.__class__.__name__ == "Commit"):
+            commit_message = self.recvCommit(message)#if you are getting a commit message from someone, and you haven't already committed.
+            #return false, if you have already committed.
+            print("RECEIVED COMMIT")
+            if(commit_message):#if you are told my someone else to commit.(might get more than one message here.)
+                self.commit(commit_message)
+                self.storage.setRound(message.i+1)#don't want to try committing something when its gonna fail.
+
 
 
         ##so on.
     def twitterEvent(self,new_event):#make sure maxindex is in storage and what that means.
         if(self.storage.current_values[self.storage.maxindex] == None):
-            self.propose_event(new_event,self.storage.maxindex)
+            proposal = self.propose_event(new_event,self.storage.maxindex)
+            #print("PROPOSAL: ",proposal)
         else:
             return False
 
@@ -244,10 +257,13 @@ class Client:
         self.communicator.propose(msg)
         #print("proposed sent")
 
+    #accept commit message.
+    def recvCommit(self,message):
+        return self.storage.event_list[message.i] == None
+
     def commit(self,message):
         print("COMMIT")
         self.storage.commitEvent(message.i,message.v)
-        self.storage.setRound(self.storage.maxindex+1)
 
         #blocks and
         if(message.v.op == "block"):
@@ -255,7 +271,6 @@ class Client:
         elif(message.v.op == "unblock"):
             self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = False
 
-        ##increment round size.
 
     def crashRecover(self):
 

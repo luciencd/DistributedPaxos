@@ -46,6 +46,13 @@ class Accepted(Message):
         #unsure if we need to include value v... if proposer(n) can't be < n, and if it is greater than proposer(n), the proposer failed
         ##and if it is equal, the proposer(n), already knows its own value
 
+class Commit(Message):
+    def __init__(self,committedValue,index,process):
+        self.msg_type = "commit"
+        self.v = committedValue
+        self.i = index
+        self.p = process
+
 class MessageReader:
     @staticmethod
     def fromJSON(payload):
@@ -75,7 +82,14 @@ class MessageReader:
                 v = event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"])
                 new_msg = Accepted(dict_data["n"],v,dict_data["i"],dict_data["p"])
             else:
-                new_msg = AcceptRequest(dict_data["n"],None,dict_data["i"],dict_data["p"])
+                new_msg = Accepted(dict_data["n"],None,dict_data["i"],dict_data["p"])##not actually possible though
+        elif(dict_data["msg_type"] == "commit"):
+            e = dict_data["v"]
+            if(e != None):
+                v = event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"])
+                new_msg = Commit(dict_data["n"],v,dict_data["i"],dict_data["p"])
+            else:
+                new_msg = Commit(dict_data["n"],None,dict_data["i"],dict_data["p"])
         else:
             raise MessageNotRecognizedError
 
