@@ -280,14 +280,14 @@ class Client:
     def view(self):
         tweets_list_string = []
 
-        for i in range(self.maxindex):#self.storage.event_list:
+        for i in range(self.storage.maxindex):#self.storage.event_list:
             event = self.storage.event_list[i]
             if(event == None):
                 tweets_list_string.append("EMPTY LOG ENTRY")
             elif(event.op == "tweet"):
                 if(not self.isBlocked(event.site)):
                     tweets_list_string.append(event.__str__())
-        
+
         return "\n".join(tweets_list_string)
 
 
