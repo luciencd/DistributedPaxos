@@ -194,7 +194,7 @@ class Client:
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
         n = self.proposer.getProposal()
-        msg = Prepare(n,self.proposer.getProposal(),self.id)
+        msg = Prepare(n,index,self.id)
 
         print("setting self value")
         #make sure to initially set the promise values and all that.
