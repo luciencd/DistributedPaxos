@@ -50,7 +50,7 @@ class Proposer(Agent):
         print("storing Value:",value.data)
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
-        if(self.isPromiseQuorum(message.i)):
+        if(self.isPromiseQuorum(message.i)>=0):
             return True#or new message.
         else:
             return False
@@ -77,6 +77,8 @@ class Proposer(Agent):
             self.storage.setChosenMaxProposal(self.storage.getChosenMaxProposal()+1)
             return False
 
+    def numProcesses(self):
+        return len(self.storage.current_values[0])
 
     def isAcceptedQuorum(self):
         #find out if self.storage.getAcceptances(index) has a majority.
@@ -106,10 +108,14 @@ class Proposer(Agent):
                     counts[None] = (1,None,None)
 
         for key, value in counts.items():
-            print(key,value)
+            if(value[0] > self.numProcesses()//2):
+                print("QUROUM reached! accept proposal",value[1],"tweet",value[2])
+                return value[1]
+            else:
+                print("not a quorum for proposal",value[1])
 
 
-        return True
+        return -1
 #learner is there to find out when a value has been chosen (by the acceptors)
 #and to broadcast that knowledge to all the proposers/clients,
 #so that they do not have to keep sending proposals for no reason
@@ -153,7 +159,7 @@ class Client:
         self.proposer = proposer
         self.acceptor = acceptor # Acceptor(self.id)
         self.learner = learner #Learner(self.id)
-        #this class references the Log,
+
         #and encapsulates the proposer, learner and acceptor agents.
         self.event_queue = []
 
@@ -171,7 +177,10 @@ class Client:
             if(promise != False):
                 self.communicator.send_synod(promise)
         elif(message.__class__.__name__ == "Promise"):
-            self.proposer.recvPromise(message)
+            accept_request = self.proposer.recvPromise(message)
+            if(accept_request != False):
+                print("gonna send out accept request! for message value")
+                #self.communicator.broadcast_synod(accept_request)
         elif(message.__class__.__name__ == "AcceptRequest"):
             self.acceptor.recvAcceptRequest(message)
         elif(message.__class__.__name__ == "Accepted"):
@@ -179,16 +188,22 @@ class Client:
 
 
         ##so on.
+    def twitterEvent(self,new_event):
+        self.propose_event(new_event,self.maxindex)
 
-    def propose_event(self,new_event):
+    #when you tweet for the first tme
+    def propose_event(self,index,new_event):
         n = self.proposer.getProposal()
-        msg = Prepare(n,self.storage.maxindex,self.id)
+        msg = Prepare(n,self.proposal.getProposal(index),self.id)
 
-        print("proposing")
         print("setting self value")
-        self.storage.setCurrentValue(self.storage.maxindex,new_event)
+        #make sure to initially set the promise values and all that.
+        self.storage.setCurrentValue(index,self.proposal.getProposal(index),new_event)
+        self.storage.setPromisesReceived(index,self.id,self.proposal.getProposal(index),new_event)
+
+        print("proposing message sending")
         self.communicator.propose(msg)
-        print("proposed")
+        print("proposed sent")
 
 
 
@@ -205,9 +220,16 @@ class Client:
     #right now it is 0, but later, we will use more sophisticated algorithm to ensure it works
     #despite the 0 process crashing
 
-
+    #printing out all events properly.
     def view(self):
         return self.storage.view()
 
+    #showing the internal stable state.
+    def datadump(self):
+        data = self.storage.view()
+        #make prettier.
+        return data
+
+    #incase we want to reset everything on all nodes to revert without messing with indiviudal files.
     def erase(self):
         self.storage.erase()

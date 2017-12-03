@@ -93,6 +93,8 @@ def main():
     N = len(nodes)
     storage = Storage("data/static.p",len(nodes))
     client = Client(self_id,communicator,Proposer(self_id,N,storage),Acceptor(self_id,N,storage),Learner(self_id,N,storage),names,storage)
+    ###recoverFromFile here, so when we get to work we have the right shit in log.
+
 
     communicator.addClient(client)
     print("communicator.start(self_id)")
@@ -112,7 +114,7 @@ def main():
 
         if user_option == "tweet":
             new_tweet = collect_tweet(self_id,now_time,names)
-            client.propose_event(new_tweet)
+            client.twitterEvent(new_tweet)
         elif user_option =="view":
             data = client.view()
             print()
@@ -122,7 +124,7 @@ def main():
         elif user_option =="block":
             new_block = collect_block(self_id,now_time,names)
             if new_block != None:
-                client.propose_event(new_block)
+                client.twitterEvent(new_block)
 
             else:
                 print("Invalid block, doing nothing.")
@@ -130,10 +132,13 @@ def main():
         elif user_option =="unblock":
             new_unblock = collect_unblock(self_id,now_time,names)
             if new_unblock != None:
-                client.propose_event(new_unblock)
+                client.twitterEvent(new_unblock)
             else:
                 print("Invalid unblock, doing nothing.")
-
+        elif user_option == "data":
+            data = client.datadump()
+            print()
+            print(data)
         elif user_option == "name":
             print("My name is:",communicator.name)
         elif user_option == "erase":
