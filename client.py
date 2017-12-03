@@ -326,6 +326,9 @@ class Client:
     #showing the internal stable state.
     def data(self):
         #make prettier.
+        return self.storage.view()
+
+    def nicedata(self):
         return json.dumps(self.storage.view(), indent=4, sort_keys=True)
 
     #incase we want to reset everything on all nodes to revert without messing with indiviudal files.
