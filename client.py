@@ -67,6 +67,7 @@ class Proposer(Agent):
         if(self.isPromiseQuorum(message.i)>=0):
             #counts = self.getTotalCounts(index)
             high_value = self.highest_value_of_proposals(message.i)
+            print("high value is ",high_value)
             self.storage.setCurrentValue(message.i,high_value)
             #find the highest proposal number and create an acceptedRequest with it
             acc = AcceptRequest(self.getProposal(),self.storage.current_values[message.i],message.i,self.id)#or new message.
