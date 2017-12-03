@@ -147,7 +147,7 @@ class Acceptor(Agent):
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
 
-        return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,message.p)
+        return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
 
 
     def recvAcceptRequest(self,message):
@@ -178,7 +178,7 @@ class Client:
         if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
             promise = self.acceptor.recvPrepare(message)
             if(promise != False):
-                self.communicator.send_synod(promise)
+                self.communicator.send_synod(promise,message.p)
         elif(message.__class__.__name__ == "Promise"):
             accept_request = self.proposer.recvPromise(message)
             if(accept_request != False):

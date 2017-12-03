@@ -139,11 +139,11 @@ class Communicator:
         outgoing_sock.close()
 
     ##when we want to send a single message from an acceptor back to the proposer.
-    def send_synod(self,message):
+    def send_synod(self,message,to):
         outgoing_sock = self.make_socket()
         outgoing_sock.settimeout(2)
 
         m = message.toJSON() + Communicator.DELIM
-        outgoing_sock.sendto(m.encode(), self.nodes[message.p])
+        outgoing_sock.sendto(m.encode(), self.nodes[to])
 
         outgoing_sock.close()
