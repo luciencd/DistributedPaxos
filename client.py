@@ -90,7 +90,7 @@ class Proposer(Agent):
         print(self.storage.promises_received[index])
         counts = dict()
 
-        for i in range(self.storage.promises_received[index]):
+        for i in range(len(self.storage.promises_received[index])):
             promise_number = self.storage.promises_received[index][i][0]
             promise_value = self.storage.promises_received[index][i][1]
 
