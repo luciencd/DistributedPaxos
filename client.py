@@ -47,28 +47,24 @@ class Proposer(Agent):
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
         #(self,index,p,n,value):
+        print("RECV PROMISE")
         value = message.v
-        print("incoming value:",value)
-        print(message.i)
 
         if(value == None):
             value = self.storage.current_values[message.i]
         else:
             value = message.v
-        print("storing own Value:",value.data)
-        print(self.storage.current_values[message.i])
+
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
-        print("now we have this values at index.",self.storage.current_values[message.i].data)
-        print("with these proposals:",self.storage.promises_received[message.i])
 
         if(self.isPromiseQuorum(message.i)>=0):
             #counts = self.getTotalCounts(index)
             high_value = self.highest_value_of_proposals(message.i)
-            print("high value is ",high_value)
+            #print("high value is ",high_value)
             self.storage.setCurrentValue(message.i,high_value)
             #find the highest proposal number and create an acceptedRequest with it
             acc = AcceptRequest(self.getProposal(),self.storage.current_values[message.i],message.i,self.id)#or new message.
-            print(acc)
+            #print(acc)
             return acc
         else:
             return False
@@ -76,6 +72,7 @@ class Proposer(Agent):
     def recvAccepted(self,message):
         #If failed to get majority or contradiction of consensus.
         #create new proposal
+        print("RECV ACCEPTED")
 
         self.storage.setAcceptancesReceived(message.i,message.p,message.n)
 
@@ -105,12 +102,12 @@ class Proposer(Agent):
         for i in range(len(self.storage.acceptances_received[index])):
             if(self.storage.acceptances_received[index][i] != None):
                 maj += 1
-        print("count processes",maj)
+        #print("count processes",maj)
         return maj > (len(self.storage.acceptances_received[index])//2 + 1)
 
     def getTotalCounts(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.
-        print(self.storage.promises_received[index])
+        #print(self.storage.promises_received[index])
         counts = dict()
 
         for i in range(len(self.storage.promises_received[index])):
@@ -153,9 +150,7 @@ class Acceptor(Agent):
         super().__init__(id_,N,storage)
 
     def recvPrepare(self,message):
-        print("Acceptor. recvPrepare()")
-        print("received Proposal")
-        print("proposal id:",message.n)
+        print("RECV PREPARE")
         #figure out what leader should send. if its 0, that's not gonna work right.
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
@@ -164,6 +159,7 @@ class Acceptor(Agent):
 
 
     def recvAcceptRequest(self,message):
+        print("RECV ACCEPT REQUEST")
         if(message.n >= self.storage.min_proposal[message.i]):
             self.storage.setMinProposal(message.i,message.n)
             self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
@@ -194,7 +190,7 @@ class Client:
 
     #this has to be an anti-pattern
     def readMessage(self,message):
-        print("reading msg class name:",message.__class__.__name__)
+        #print("reading msg class name:",message.__class__.__name__)
         if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
             promise = self.acceptor.recvPrepare(message)
             if(promise != False):
@@ -208,9 +204,9 @@ class Client:
                 accept = self.acceptor.recvAcceptRequest(accept_request)
                 self.proposer.recvAccepted(accept)
                 ##hope this always works.
-                print("Current Accept Requests. should have [none, 1]",self.storage.acceptances_received)
-                print("gonna send out accept request! for message value")
-                print(accept_request)
+                #print("Current Accept Requests. should have [none, 1]",self.storage.acceptances_received)
+                #print("gonna send out accept request! for message value")
+                #print(accept_request)
                 #send accepts to all other processes but yourself.
                 self.communicator.broadcast_synod(accept_request)
         elif(message.__class__.__name__ == "AcceptRequest"):
@@ -230,21 +226,23 @@ class Client:
 
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
+        print("PROPOSE EVENT")
         n = self.proposer.getProposal()
         msg = Prepare(n,index,self.id)
 
-        print("setting self value")
+        #print("setting self value")
         #make sure to initially set the promise values and all that.
         self.storage.setCurrentValue(index,new_event)
         self.storage.setPromisesReceived(index,self.id,self.proposer.getProposal(),new_event)
         #figure out if this can be better abstracted though similar function to when you send it to a different
         #client's acceptor.
 
-        print("proposing message sending")
+        #print("proposing message sending")
         self.communicator.propose(msg)
-        print("proposed sent")
+        #print("proposed sent")
 
     def commit(self,message):
+        print("COMMIT")
         self.log_dict[message.i] = message.v
 
     def crashRecover(self):
