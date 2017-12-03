@@ -220,6 +220,10 @@ class Client:
                 #only after you yourself are committing, not getting a commit from somewhere else.
                 self.storage.setRound(self.storage.maxindex+1)
 
+                #send commit message to others.
+                commit_message = Commit(message.v,message.i,message.p)
+                self.communicator.broadcast_synod(commit_message)
+
 
         elif(message.__class__.__name__ == "Commit"):
             commit_message = self.recvCommit(message)#if you are getting a commit message from someone, and you haven't already committed.
