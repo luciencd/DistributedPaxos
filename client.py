@@ -33,9 +33,6 @@ class Proposer(Agent):
     def setLeader(self,leaderize=False):
         self.leader = leaderize
 
-    def sendAcceptRequest(self):
-        msg = AcceptRequest()
-        pass
 
     def highest_value_of_proposals(self,index):
         counts = self.getTotalCounts(index)
@@ -95,7 +92,7 @@ class Proposer(Agent):
             return True
             #return sendProposal() #fail!
         else:
-            self.storage.setChosenMaxProposal(self.storage.getChosenMaxProposal()+1)
+            #self.storage.setChosenMaxProposal(self.storage.getChosenMaxProposal()+1)
             return False
 
     def numProcesses(self):
@@ -155,14 +152,6 @@ class Acceptor(Agent):
     def __init__(self,id_,N,storage):
         super().__init__(id_,N,storage)
 
-    def sendPromise(self):
-
-        return msg
-
-    def sendAcceptance(self):
-        pass
-
-
     def recvPrepare(self,message):
         print("Acceptor. recvPrepare()")
         print("received Proposal")
@@ -201,7 +190,7 @@ class Client:
         self.storage = storage
         #self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
 
-
+        self.log_dict = {}
 
     #this has to be an anti-pattern
     def readMessage(self,message):
@@ -230,7 +219,9 @@ class Client:
                 self.communicator.send_synod(accept,message.p)
 
         elif(message.__class__.__name__ == "Accepted"):
-            self.proposer.recvAccepted(message)
+            commit_bool = self.proposer.recvAccepted(message)
+            if(commit_bool):
+                self.commit(message)
 
 
         ##so on.
@@ -253,7 +244,8 @@ class Client:
         self.communicator.propose(msg)
         print("proposed sent")
 
-
+    def commit(self,message):
+        self.log_dict[message.i] = message.v
 
     def crashRecover(self):
 
@@ -270,7 +262,7 @@ class Client:
 
     #printing out all events properly.
     def view(self):
-        return self.storage.view()
+        return self.log_dict
 
     #showing the internal stable state.
     def datadump(self):
