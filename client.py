@@ -85,10 +85,23 @@ class Proposer(Agent):
         self.storage.acceptances_received
         return True
 
-    def isPromiseQuorum(self):
+    def isPromiseQuorum(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.
+        print(self.storage.promises_received[index])
+        counts = dict()
 
-        #for i in range(self.storage.promises_received[self.index]):
+        for i in range(self.storage.promises_received[index]):
+            promise_number = self.storage.promises_received[index][i][0]
+            promise_value = self.storage.promises_received[index][i][1]
+
+            if(promise_number in counts):
+                counts[promise_number] = (counts[promise_number][0]+1,promise_number,promise_value)
+            else:
+                counts[promise_number] = (1,promise_number,promise_value)
+
+        for key, value in counts.items():
+            print(key,value)
+
 
         return True
 #learner is there to find out when a value has been chosen (by the acceptors)
