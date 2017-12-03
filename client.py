@@ -230,7 +230,7 @@ class Client:
             #return false, if you have already committed.
             print("RECEIVED COMMIT")
             if(commit_message):#if you are told my someone else to commit.(might get more than one message here.)
-                self.commit(commit_message)
+                self.commit(message)
                 self.storage.setRound(message.i+1)#don't want to try committing something when its gonna fail.
 
 
