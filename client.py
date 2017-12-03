@@ -80,7 +80,7 @@ class Proposer(Agent):
         #If failed to get majority or contradiction of consensus.
         #create new proposal
 
-        self.storage.setAcceptance(message.i,message.p,message.n)
+        self.storage.setAcceptancesReceived(message.i,message.p,message.n)
 
         if(self.isAcceptedQuorum(message.i)):
             #When the Proposal gets N/2 + 1 Acceptances.
@@ -212,8 +212,11 @@ class Client:
             accept_request = self.proposer.recvPromise(message)
             if(accept_request != False):#when you have a quorum
 
-                #obviously send accept request to yourself when you
-                self.acceptor.recvAcceptRequest(accept_request)
+                #obviously send accept request to yourself when you do this.
+                accept = self.acceptor.recvAcceptRequest(accept_request)
+                self.proposer.recvAccepted(accept)
+                ##hope this always works.
+                print("Current Accept Requests. should have [none, 1]",self.storage.acceptances_received)
                 print("gonna send out accept request! for message value")
                 print(accept_request)
                 #send accepts to all other processes but yourself.
