@@ -120,6 +120,7 @@ class Storage:
             f =  open( filename, "rb" )
             try:
                  d = pickle.load(f)
+                 print(d)
                  self.__dict__ = d
             except EOFError:
                 pass
