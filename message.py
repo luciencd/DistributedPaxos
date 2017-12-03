@@ -58,7 +58,7 @@ class MessageReader:
             e = dict_data["v"]
             if(e != None):
                 v = event(e["site"], e["op"], e["data"], e["truetime"], e["name"], e["timestamp"])
-                new_msg = Promise(dict_data["n"],v,dict_data["i"])
+                new_msg = Promise(dict_data["n"],v,dict_data["i"],dict_data["p"])
             else:
                 new_msg = Promise(dict_data["n"],None,dict_data["i"],dict_data["p"])
 
