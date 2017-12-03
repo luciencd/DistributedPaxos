@@ -279,7 +279,7 @@ class Client:
             elif(event.op == "tweet"):
                 if(not self.isBlocked(event.site)):
                     tweets_list_string.append(event.__str__)
-
+        print("list: ",tweets_list_string)
         return "\n".join(tweets_list_string)
 
 
