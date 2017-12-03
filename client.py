@@ -91,13 +91,19 @@ class Proposer(Agent):
         counts = dict()
 
         for i in range(len(self.storage.promises_received[index])):
-            promise_number = self.storage.promises_received[index][i][0]
-            promise_value = self.storage.promises_received[index][i][1]
+            if(self.storage.promises_received[index][i] != None):
+                promise_number = self.storage.promises_received[index][i][0]
+                promise_value = self.storage.promises_received[index][i][1]
 
-            if(promise_number in counts):
-                counts[promise_number] = (counts[promise_number][0]+1,promise_number,promise_value)
+                if(promise_number in counts):
+                    counts[promise_number] = (counts[promise_number][0]+1,promise_number,promise_value)
+                else:
+                    counts[promise_number] = (1,promise_number,promise_value)
             else:
-                counts[promise_number] = (1,promise_number,promise_value)
+                if(None in counts):
+                    counts[None] = (counts[promise_number][0]+1,None,None)
+                else:
+                    counts[None] = (1,None,None)
 
         for key, value in counts.items():
             print(key,value)
