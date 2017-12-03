@@ -80,13 +80,9 @@ class Proposer(Agent):
             print("MESSAGE COMMITTING:",message.v,type(message.v))
             print("MESSAGE dict",message.v.op)
             #When the Proposal gets N/2 + 1 Acceptances.
-            if(message.v.op == "tweet"):
+
                 #unsure if message.i is necessary or self.i
-                self.storage.tweet(message.i,message.v)
-            elif(message.v.op == "block"):
-                self.storage.block(message.i,message.v)
-            elif(message.v.op == "unblock"):
-                self.storage.unblock(message.i,message.v)
+            self.storage.commitEvent(message.i,message.v)
 
             return True
             #return sendProposal() #fail!
@@ -246,6 +242,12 @@ class Client:
         print("COMMIT")
         self.log_dict[message.i] = message.v
 
+        #blocks and
+        if(message.v.op == "block"):
+            self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = True
+        elif(message.v.op == "unblock"):
+            self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = False
+
     def crashRecover(self):
 
         #first, messages from static storage must be recreated.
@@ -259,9 +261,28 @@ class Client:
     #right now it is 0, but later, we will use more sophisticated algorithm to ensure it works
     #despite the 0 process crashing
 
+    def isBlocked(self,other_site):
+        try:
+            return self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())]
+        except KeyError:
+            return False
+
     #printing out all events properly.
     def view(self):
-        return self.log_dict
+        tweets_list_string = []
+
+        log = self.storage.event_list
+        for event in log:
+            if(event == None):
+                tweets_list_string.append("EMPTY LOG ENTRY")
+            if(event.op == "tweet"):
+                if(not self.isBlocked(event.site)):
+                    tweets_list_string.append(event.__str__)
+
+        return "\n".join(tweets_list_string)
+
+
+
 
     #showing the internal stable state.
     def data(self):

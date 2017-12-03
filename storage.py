@@ -61,6 +61,8 @@ class Storage:
             self.accepted_proposal.append(None)
             self.accepted_value.append(None)
 
+            self.event_list.append(None)
+
         self.commit()
 
 
@@ -90,6 +92,10 @@ class Storage:
 
     def setAcceptedValue(self,index,value):
         self.accepted_value[index] = value
+        self.commit()
+
+    def commitEvent(self,index,event):
+        self.event_list[index] = event
         self.commit()
 
     def recoverFromFile(self,filename):
