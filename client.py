@@ -275,7 +275,7 @@ class Client:
             print("EVENT ",event)
             if(event == None):
                 tweets_list_string.append("EMPTY LOG ENTRY")
-            if(event.op == "tweet"):
+            elif(event.op == "tweet"):
                 if(not self.isBlocked(event.site)):
                     tweets_list_string.append(event.__str__)
 
