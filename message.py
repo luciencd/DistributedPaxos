@@ -70,7 +70,7 @@ class MessageReader:
             else:
                 new_msg = AcceptRequest(dict_data["n"],None,dict_data["i"],dict_data["p"])
         elif(dict_data["msg_type"] == "accepted"):
-            new_msg = Accepted(dict_data["n"],dict_data["i"],dict_data["p"])
+            new_msg = Accepted(dict_data["n"],dict_data["v"],dict_data["i"],dict_data["p"])
         else:
             raise MessageNotRecognizedError
 
