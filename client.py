@@ -252,6 +252,7 @@ class Client:
 
         #print("setting self value")
         #make sure to initially set the promise values and all that.
+        print("NEW EVENT:",new_event)
         self.storage.setCurrentValue(index,new_event)
         self.storage.setPromisesReceived(index,self.id,self.proposer.getProposal(),new_event)
         #figure out if this can be better abstracted though similar function to when you send it to a different
