@@ -221,7 +221,7 @@ class Client:
 
         ##so on.
     def twitterEvent(self,new_event):#make sure maxindex is in storage and what that means.
-        if(self.storage[self.storage.maxindex] == None):
+        if(self.storage.current_values[self.storage.maxindex] == None):
             self.propose_event(new_event,self.storage.maxindex)
         else:
             return False
