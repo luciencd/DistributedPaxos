@@ -264,7 +264,7 @@ class Client:
 
     def isBlocked(self,other_site):
         try:
-            return self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())]
+            return self.block_dictionary[(self.id,other_site)]
         except KeyError:
             return False
 
