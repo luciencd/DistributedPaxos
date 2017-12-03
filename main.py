@@ -136,7 +136,7 @@ def main():
             else:
                 print("Invalid unblock, doing nothing.")
         elif user_option == "data":
-            data = client.datadump()
+            data = client.data()
             print()
             print(data)
         elif user_option == "name":

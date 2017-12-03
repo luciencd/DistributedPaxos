@@ -192,7 +192,7 @@ class Client:
         self.propose_event(new_event,self.storage.maxindex)
 
     #when you tweet for the first tme
-    def propose_event(self,index,new_event):
+    def propose_event(self,new_event,index):
         n = self.proposer.getProposal()
         msg = Prepare(n,self.proposer.getProposal(),self.id)
 
