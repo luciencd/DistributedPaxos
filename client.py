@@ -194,12 +194,12 @@ class Client:
     #when you tweet for the first tme
     def propose_event(self,index,new_event):
         n = self.proposer.getProposal()
-        msg = Prepare(n,self.proposal.getProposal(index),self.id)
+        msg = Prepare(n,self.proposer.getProposal(index),self.id)
 
         print("setting self value")
         #make sure to initially set the promise values and all that.
-        self.storage.setCurrentValue(index,self.proposal.getProposal(index),new_event)
-        self.storage.setPromisesReceived(index,self.id,self.proposal.getProposal(index),new_event)
+        self.storage.setCurrentValue(index,self.proposer.getProposal(index),new_event)
+        self.storage.setPromisesReceived(index,self.id,self.proposer.getProposal(index),new_event)
 
         print("proposing message sending")
         self.communicator.propose(msg)
