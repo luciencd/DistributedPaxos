@@ -92,6 +92,7 @@ class Storage:
 
     def setCurrentValue(self,index,value):
         #self.maxIndexise(index)
+        print("sCV: value",value,"index:",index)
         self.current_values[index] = value
         self.commit()
 

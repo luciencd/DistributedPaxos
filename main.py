@@ -33,6 +33,7 @@ def collect_tweet(site,now_time,names):
     print(site,EventTypes.TWEET, tweet_text,now_time)
     print("names:",names[site])
     print("\n")
+    return e
 
 def collect_block(site,now_time,names):
     blocked_text = input("Enter your block: ")
