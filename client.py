@@ -172,8 +172,15 @@ class Acceptor(Agent):
 
 
     def recvAcceptRequest(self,message):
-        if(message.v.accepted_id >= self.storage.promised_id):
-            self.promised_id
+        if(message.n >= self.storage.min_proposal[message.i]):
+            self.storage.setMinProposal(message.i,message.n)
+            self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
+            self.storage.setAcceptedValue(message.i,message.v)
+            return Accepted(self.storage.min_proposal[message.i],message.i,self.id)
+
+        else:
+            #don't think I need to do anything, although I could send a Nack.
+            pass
 
 
 class Client:
@@ -201,13 +208,21 @@ class Client:
             if(promise != False):
                 self.communicator.send_synod(promise,message.p)
         elif(message.__class__.__name__ == "Promise"):
+
             accept_request = self.proposer.recvPromise(message)
-            if(accept_request != False):
+            if(accept_request != False):#when you have a quorum
+
+                #obviously send accept request to yourself when you
+                self.acceptor.recvAcceptRequest(accept_request)
                 print("gonna send out accept request! for message value")
                 print(accept_request)
+                #send accepts to all other processes but yourself.
                 self.communicator.broadcast_synod(accept_request)
         elif(message.__class__.__name__ == "AcceptRequest"):
-            self.acceptor.recvAcceptRequest(message)
+            accept = self.acceptor.recvAcceptRequest(message)
+            if(accept != False):#send Accepts back to the proposers.
+                self.communicator.send_synod(accept,message.p)
+
         elif(message.__class__.__name__ == "Accepted"):
             self.proposer.recvAccepted(message)
 
@@ -225,6 +240,8 @@ class Client:
         #make sure to initially set the promise values and all that.
         self.storage.setCurrentValue(index,new_event)
         self.storage.setPromisesReceived(index,self.id,self.proposer.getProposal(),new_event)
+        #figure out if this can be better abstracted though similar function to when you send it to a different
+        #client's acceptor.
 
         print("proposing message sending")
         self.communicator.propose(msg)
