@@ -103,7 +103,7 @@ class Proposer(Agent):
             if(self.storage.acceptances_received[index][i] != None):
                 maj += 1
         print("count processes",maj)
-        return maj > (len(self.storage.acceptances_received[index])//2 + 1)
+        return maj >= (len(self.storage.acceptances_received[index])//2 + 1)
 
     def getTotalCounts(self,index):
         #find out if self.storage.getAcceptances(index) has a majority.
