@@ -275,9 +275,9 @@ class Client:
 
         #blocks and
         if(message.v.op == "block"):
-            self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = True
+            self.block_dictionary[(message.v.get_blocker(),message.v.get_blocked())] = True
         elif(message.v.op == "unblock"):
-            self.block_dictionary[(message.v.getBlocker(),message.v.getBlocked())] = False
+            self.block_dictionary[(message.v.get_blocker(),message.v.get_blocked())] = False
 
 
     def crashRecover(self):
