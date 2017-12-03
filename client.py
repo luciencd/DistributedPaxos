@@ -313,6 +313,13 @@ class Client:
 
         return "\n".join(tweets_list_string)
 
+    def blocks(self):
+        print(self.block_dictionary)
+        lines = []
+        for key,value in self.block_dictionary:
+            if(value == True):
+                lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
+        return "\n".join(lines)
 
     #showing the internal stable state.
     def data(self):

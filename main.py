@@ -120,7 +120,6 @@ def main():
 
         if user_option == "tweet":
             new_tweet = collect_tweet(self_id,now_time,names)
-            print("main view new_Tweet",new_tweet)
             client.twitterEvent(new_tweet)
         elif user_option =="view":
             data = client.view()
@@ -144,6 +143,10 @@ def main():
                 print("Invalid unblock, doing nothing.")
         elif user_option == "data":
             data = client.data()
+            print()
+            print(data)
+        elif user_option == "blocks":
+            data = client.blocks()
             print()
             print(data)
         elif user_option == "name":
