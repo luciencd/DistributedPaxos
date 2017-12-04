@@ -343,6 +343,18 @@ class Client:
                 lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
         return "\n".join(lines)
 
+    def view_log(self):
+        log_view = []
+
+        for i in range(self.storage.maxindex):#self.storage.event_list:
+            event = self.storage.event_list[i]
+            if(event == None):
+                tweets_list_string.append("EMPTY LOG ENTRY")
+            else:
+                tweets_list_string.append(event.string2())
+
+        return "\n".join(tweets_list_string)
+
     #showing the internal stable state.
     def data(self):
         #make prettier.

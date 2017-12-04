@@ -126,11 +126,15 @@ def main():
             print()
             print(data)
             #print(*list_tweets, sep="\n\n", end = "\n\n")
+        elif user_option == "view_log":
+            data = client.view_log()
+            print()
+            print(data)
 
         elif user_option =="block":
             new_block = collect_block(self_id,now_time,names)
             if new_block != None:
-                
+
                 client.twitterEvent(new_block)
 
             else:
