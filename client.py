@@ -3,20 +3,21 @@ from message import Prepare,Promise,AcceptRequest,Accepted,MessageReader,Message
 import json
 
 class Agent:
-    def __init__(self,id_,N,storage):
+    def __init__(self,id_,N,storage,names):
         self.id = id_
         self.N = N#number of processes. index equivalent to the position.
 
         self.storage = storage
-
+        self.names = names
+        
     def getServerID():
         return self.id
 
 
 ##should make these agents store their states in stable storage.
 class Proposer(Agent):
-    def __init__(self,id_,N,storage):
-        super().__init__(id_,N,storage)
+    def __init__(self,id_,N,storage,names):
+        super().__init__(id_,N,storage,names)
         self.leader = False
 
 
@@ -151,8 +152,8 @@ class Learner(Agent):
 
 ##should make these agents store their states in stable storage.
 class Acceptor(Agent):
-    def __init__(self,id_,N,storage):
-        super().__init__(id_,N,storage)
+    def __init__(self,id_,N,storage,names):
+        super().__init__(id_,N,storage,names)
 
     def recvPrepare(self,message):
         print("RECV PREPARE from",self.names[message.p])

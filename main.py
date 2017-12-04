@@ -98,7 +98,7 @@ def main():
 
     N = len(nodes)
     storage = Storage("data/static.p",len(nodes),0,50)
-    client = Client(self_id,communicator,Proposer(self_id,N,storage),Acceptor(self_id,N,storage),Learner(self_id,N,storage),names,storage)
+    client = Client(self_id,communicator,Proposer(self_id,N,storage,names),Acceptor(self_id,N,storage,names),Learner(self_id,N,storage,names),names,storage)
     ###recoverFromFile here, so when we get to work we have the right shit in log.
 
 
