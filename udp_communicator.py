@@ -6,10 +6,11 @@ from message import Message,MessageReader
 #subclass communicator into UDP communicator and TCP communicator.
 class Communicator:
     DELIM = "\n"
-    def __init__(self, nodes_):
+    def __init__(self, nodes_,names):
         #store the list of sites we know about
         self.nodes = nodes_
         self.name = "No Name"
+        self.names = names
 
         #store an inverted lookup table where knowing an addr allows us
         #to find a node number -- this will be useful for processing socket data
