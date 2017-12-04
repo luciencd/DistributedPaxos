@@ -244,7 +244,7 @@ class Client:
         print("twitter event()",new_event)
         if(self.storage.current_values[self.storage.maxindex] == None):
             print("twitter event() None if",new_event)
-            if(self.proposer.isLeader()):
+            if(self.proposer.isLeader(self.storage.maxindex)):
                 acceptal = self.accept_event(new_event,self.storage.maxindex)
             else:
                 proposal = self.propose_event(new_event,self.storage.maxindex)
