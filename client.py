@@ -44,7 +44,7 @@ class Proposer(Agent):
 
     def highest_value_of_proposals(self,index):
         counts = self.getTotalCounts(index)
-        print("COUNTS",counts)
+        #print("COUNTS",counts)
         max_proposal = -1
         max_value = None
         for key, value in counts.items():
@@ -176,7 +176,8 @@ class Acceptor(Agent):
 
         else:
             #don't think I need to do anything, although I could send a Nack.
-            pass
+
+            return False
 
 
 class Client:
@@ -203,8 +204,13 @@ class Client:
         #print("reading msg class name:",message.__class__.__name__)
         if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
             promise = self.acceptor.recvPrepare(message)
-            if(promise != False):
+            if(promise == True):
                 self.communicator.send_synod(promise,message.p)
+            elif(promise == False):
+                if(self.storage.event_list[message.i] != None):
+                    commit = Commit(self.storage.event_list[message.i],message.i,self.id)
+                    self.communicator.send_synod(commit,message.p)
+
         elif(message.__class__.__name__ == "Promise"):
 
             accept_request = self.proposer.recvPromise(message)
@@ -221,7 +227,15 @@ class Client:
                 self.communicator.broadcast_synod(accept_request)
         elif(message.__class__.__name__ == "AcceptRequest"):
             accept = self.acceptor.recvAcceptRequest(message)
-            if(accept != False):#send Accepts back to the proposers.
+            if(accept == False):#as in, you failed to send the right accept(could be you recovering.)
+                #didn't accept value
+
+                #if the value has been chosen though, send it back!! #this is some pseudo learner stuff here.
+                if(self.storage.event_list[message.i] != None):
+                    commit = Commit(self.storage.event_list[message.i],message.i,self.id)
+                    self.communicator.send_synod(commit,message.p)
+
+            elif(accept == True):#send Accepts back to the proposers.
                 self.communicator.send_synod(accept,message.p)
 
         elif(message.__class__.__name__ == "Accepted"):
