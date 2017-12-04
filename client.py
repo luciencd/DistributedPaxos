@@ -349,7 +349,8 @@ class Client:
         lines = []
         for key,value in self.block_dictionary:
             if(value == True):
-                lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
+                print("key",key)
+                #lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
         return "\n".join(lines)
 
     def view_log(self):
