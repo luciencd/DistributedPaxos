@@ -89,7 +89,7 @@ class Communicator:
                             self.partial_received[sender_addr] = Communicator.DELIM.join(split[1:])
 
                             received_message = MessageReader.fromJSON(next_msg.strip())
-                            print("Message Received:",received_message.__dict__,"from:",sender_addr)
+                            #print("Message Received:",received_message.__dict__,"from:",sender_addr)
                             ##now we have the message object
 
                             self.client.readMessage(received_message)
@@ -125,8 +125,8 @@ class Communicator:
 
     ##when we want to send a message from the proposers to everyone (all nodes) (because all nodes/clients are acceptors)
     def broadcast_synod(self,message):#will send out proposals and acceptRequests to all processes.
-        print("broadcasting Synod algorithm.")
-        print("JSON OF MESSAGE:",message.toJSON())
+        #print("BROADCASTING ",message.msg_type,"MESSAGE")
+        #print("JSON OF MESSAGE:",message.toJSON())
         sites = set(range(0,len(self.nodes)))
         sites.remove(self.id)
         ##this will be a quorum of sites, all of them
@@ -136,7 +136,7 @@ class Communicator:
         outgoing_sock.settimeout(2)
         for site in sites:
             m = message.toJSON() + Communicator.DELIM
-            print("sending to:",self.nodes[site])
+            #print("  sending to node:",self.names[site])
             outgoing_sock.sendto(m.encode(), self.nodes[site])
 
         outgoing_sock.close()

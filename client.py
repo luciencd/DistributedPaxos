@@ -54,7 +54,7 @@ class Proposer(Agent):
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
         #(self,index,p,n,value):
-        print("RECV PROMISE")
+        print("RECV PROMISE from",message.p)
         value = message.v
 
         if(value == None):
@@ -80,7 +80,7 @@ class Proposer(Agent):
     def recvAccepted(self,message):
         #If failed to get majority or contradiction of consensus.
         #create new proposal
-        print("RECV ACCEPTED")
+        print("RECV ACCEPTED from",message.p)
 
         self.storage.setAcceptancesReceived(message.i,message.p,message.n)
 
@@ -155,7 +155,7 @@ class Acceptor(Agent):
         super().__init__(id_,N,storage)
 
     def recvPrepare(self,message):
-        print("RECV PREPARE")
+        print("RECV PREPARE from",message.p)
         #figure out what leader should send. if its 0, that's not gonna work right.
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
@@ -164,7 +164,7 @@ class Acceptor(Agent):
 
 
     def recvAcceptRequest(self,message):
-        print("RECV ACCEPT REQUEST")
+        print("RECV ACCEPT REQUEST from",message.p)
         if(message.n >= self.storage.min_proposal[message.i]):
             self.storage.setMinProposal(message.i,message.n)
             self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
@@ -236,7 +236,7 @@ class Client:
         elif(message.__class__.__name__ == "Commit"):
             commit_message = self.recvCommit(message)#if you are getting a commit message from someone, and you haven't already committed.
             #return false, if you have already committed.
-            print("RECEIVED COMMIT")
+            print("RECEIVED COMMIT from",message.p)
             if(commit_message):#if you are told my someone else to commit.(might get more than one message here.)
                 self.commit(message)
                 self.storage.setRound(message.i+1)#don't want to try committing something when its gonna fail.
@@ -295,6 +295,8 @@ class Client:
 
         #blocks and
         print("block?",message.v.op,(message.v.get_blocker(),message.v.get_blocked()))
+        if(message.v.op == "tweet"):
+            self.tweets_list.append()
         if(message.v.op == "block"):
             self.block_dictionary[(message.v.get_blocker(),message.v.get_blocked())] = True
         elif(message.v.op == "unblock"):
