@@ -260,8 +260,12 @@ class Client:
         print("ACCEPTED EVENT AS LEADER")
 
         #self.storage.setCurrentValue(index,new_event)
-        acc = AcceptRequest(self.getProposal(),self.storage.current_values[message.i],message.i,self.id)
+        acc = AcceptRequest(self.proposer.getProposal(),self.storage.current_values[message.i],message.i,self.id)
+        ##self accept request
+        accept = self.acceptor.recvAcceptRequest(acc)
+        self.proposer.recvAccepted(accept)
 
+        #send accept request to all others.
         self.communicator.acceptRequest(acc)
 
     #when you tweet for the first tme
