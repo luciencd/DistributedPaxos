@@ -92,7 +92,6 @@ class Storage:
 
     def setCurrentValue(self,index,value):
         #self.maxIndexise(index)
-        print("sCV: value",value,"index:",index)
         self.current_values[index] = value
         self.commit()
 
@@ -121,7 +120,7 @@ class Storage:
             f =  open( filename, "rb" )
             try:
                  d = pickle.load(f)
-                 print(d)
+                 print("RECOVERING FROM FILE")
                  self.__dict__ = d
             except EOFError:
                 pass

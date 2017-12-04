@@ -84,12 +84,12 @@ def main():
     own_port = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PORT
 
     nodes,names = readConfig()
-    print(nodes,names)
+    #print(nodes,names)
 
     communicator = Communicator(nodes)
     self_id = discover_site(communicator)
     communicator.name = names[self_id]
-    print("My addr is",self_id)
+    print("My addr is: ",self_id, "And my name is:",names[self_id])
 
 
 
@@ -103,13 +103,7 @@ def main():
 
 
     communicator.addClient(client)
-    print("communicator.start(self_id)")
     communicator.start(self_id)
-
-
-
-
-    #Log.start(len(nodes), communicator.id, names)
 
     user_option = ""
     while user_option != "quit":

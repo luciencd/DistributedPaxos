@@ -59,7 +59,7 @@ class Proposer(Agent):
 
         if(value == None):
             value = self.storage.current_values[message.i]
-            print("value at index",message.i,value)
+            #print("value at index",message.i,value)
         else:
             value = message.v
 
@@ -138,8 +138,8 @@ class Proposer(Agent):
                 print("QUROUM reached! accept proposal",value[1],"tweet",value[2].data)
                 return value[1]
             else:
-                print("not a quorum for proposal",value[1])
-
+                #print("not a quorum for proposal",value[1])
+                pass
 
         return -1
 #learner is there to find out when a value has been chosen (by the acceptors)
@@ -244,9 +244,7 @@ class Client:
 
         ##so on.
     def twitterEvent(self,new_event):#make sure maxindex is in storage and what that means.
-        print("twitter event()",new_event)
         if(self.storage.current_values[self.storage.maxindex] == None):
-            print("twitter event() None if",new_event)
             if(self.proposer.isLeader(self.storage.maxindex)):
                 acceptal = self.accept_event(new_event,self.storage.maxindex)
             else:
