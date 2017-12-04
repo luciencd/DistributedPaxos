@@ -349,10 +349,6 @@ class Client:
         lines = []
         for key in self.block_dictionary:
             if(self.block_dictionary[key] == True):
-                print("key",key)
-                print("names",self.names)
-                #print("blocker",key1)
-                #print("blocked",key2)
                 lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
         return "\n".join(lines)
 
@@ -366,9 +362,9 @@ class Client:
             else:
                 data = ""
                 if(event.op == "block"):
-                    data = names[event.data.split(",")[0]]+" blocks "+names[event.data.split(",")[1]]
+                    data = self.names[event.data.split(",")[0]]+" blocks "+self.names[event.data.split(",")[1]]
                 elif(event.op == "unblock"):
-                    data = names[event.data.split(",")[0]]+" unblocks "+names[event.data.split(",")[1]]
+                    data = self.names[event.data.split(",")[0]]+" unblocks "+self.names[event.data.split(",")[1]]
                 else:
                     data = event.data
 
