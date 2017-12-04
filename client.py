@@ -9,7 +9,7 @@ class Agent:
 
         self.storage = storage
         self.names = names
-        
+
     def getServerID():
         return self.id
 
@@ -288,7 +288,7 @@ class Client:
 
     #accept commit message.
     def recvCommit(self,message):
-        print("RECEIVED COMMIT from",commit_message.p)
+        print("RECEIVED COMMIT from",message.p)
         return self.storage.event_list[message.i] == None
 
     def commit(self,message):

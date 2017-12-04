@@ -111,10 +111,11 @@ def main():
         #get current time.
         now_time = datetime.utcnow()
         now_time = now_time.replace(tzinfo=tz.tzutc()).replace(microsecond=0)
-
+        print()
         if user_option == "tweet":
             new_tweet = collect_tweet(self_id,now_time,names)
             client.twitterEvent(new_tweet)
+
         elif user_option =="view":
             data = client.view()
             print()
@@ -133,6 +134,7 @@ def main():
 
             else:
                 print("Invalid block, doing nothing.")
+
 
         elif user_option =="unblock":
             new_unblock = collect_unblock(self_id,now_time,names)
@@ -160,7 +162,7 @@ def main():
         else:
             print("Invalid operation.")
 
-        print()
+
 
     communicator.stop()
     Log.stop()
