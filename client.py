@@ -305,6 +305,13 @@ class Client:
         #first, messages from static storage must be recreated.
         self.storage.recover()
 
+        for i in range(len(storage.event_list)):
+            e = storage.event_list[i]
+            if(e.op == "block"):
+                self.block_dictionary[(e.get_blocker(),e.get_blocked())] = True
+            elif(e.op == "unblock"):
+                self.block_dictionary[(e.get_blocker(),e.get_blocked())] = False
+
         #contact learners to see what messages have not been received.
 
     #########COMMITTING
@@ -349,7 +356,15 @@ class Client:
             if(event == None):
                 log_view.append("EMPTY LOG ENTRY")
             else:
-                log_view.append(event.string2())
+                data = ""
+                if(event.op == "block"):
+                    data = names[event.data.split(",")[0]]+" blocks "+names[event.data.split(",")[1]]
+                elif(event.op == "unblock"):
+                    data = names[event.data.split(",")[0]]+" unblocks "+names[event.data.split(",")[1]]
+                else:
+                    data = event.data
+                    
+                log_view.append(event.string3()+" "+data)
 
         return "\n".join(log_view)
 
