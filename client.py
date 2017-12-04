@@ -20,8 +20,8 @@ class Proposer(Agent):
         self.leader = False
 
 
-    def getProposal(self):##should work.
-        if(self.isLeader()):
+    def getProposal(self,index):##should work.
+        if(self.isLeader(index)):
             return -1
         else:
             return self.id
@@ -71,7 +71,7 @@ class Proposer(Agent):
             #print("high value is ",high_value)
             self.storage.setCurrentValue(message.i,high_value)
             #find the highest proposal number and create an acceptedRequest with it
-            acc = AcceptRequest(self.getProposal(),self.storage.current_values[message.i],message.i,self.id)#or new message.
+            acc = AcceptRequest(self.getProposal(message.i),self.storage.current_values[message.i],message.i,self.id)#or new message.
             #print(acc)
             return acc
         else:
@@ -260,7 +260,7 @@ class Client:
         print("ACCEPTED EVENT AS LEADER")
 
         #self.storage.setCurrentValue(index,new_event)
-        acc = AcceptRequest(self.proposer.getProposal(),self.storage.current_values[message.i],message.i,self.id)
+        acc = AcceptRequest(self.proposer.getProposal(index),self.storage.current_values[message.i],message.i,self.id)
         ##self accept request
         accept = self.acceptor.recvAcceptRequest(acc)
         self.proposer.recvAccepted(accept)
@@ -271,14 +271,14 @@ class Client:
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
         print("PROPOSE EVENT")
-        n = self.proposer.getProposal()
+        n = self.proposer.getProposal(index)
         msg = Prepare(n,index,self.id)
 
         #print("setting self value")
         #make sure to initially set the promise values and all that.
         print("NEW EVENT:",new_event)
         self.storage.setCurrentValue(index,new_event)
-        self.storage.setPromisesReceived(index,self.id,self.proposer.getProposal(),new_event)
+        self.storage.setPromisesReceived(index,self.id,self.proposer.getProposal(index),new_event)
         #figure out if this can be better abstracted though similar function to when you send it to a different
         #client's acceptor.
 
