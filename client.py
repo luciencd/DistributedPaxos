@@ -260,7 +260,7 @@ class Client:
         print("ACCEPTED EVENT AS LEADER")
 
         #self.storage.setCurrentValue(index,new_event)
-        acc = AcceptRequest(self.proposer.getProposal(index),self.storage.current_values[index],index,self.id)
+        acc = AcceptRequest(self.proposer.getProposal(index),new_event,index,self.id)
         ##self accept request
         accept = self.acceptor.recvAcceptRequest(acc)
         self.proposer.recvAccepted(accept)
