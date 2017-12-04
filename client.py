@@ -205,12 +205,12 @@ class Client:
         #print("reading msg class name:",message.__class__.__name__)
         if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
             promise = self.acceptor.recvPrepare(message)
-            if(promise == True):
-                self.communicator.send_synod(promise,message.p)
-            elif(promise == False):
+            if(promise == False):
                 if(self.storage.event_list[message.i] != None):
                     commit = Commit(self.storage.event_list[message.i],message.i,self.id)
                     self.communicator.send_synod(commit,message.p)
+            else:
+                self.communicator.send_synod(promise,message.p)
 
         elif(message.__class__.__name__ == "Promise"):
 
