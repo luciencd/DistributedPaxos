@@ -350,7 +350,7 @@ class Client:
         for key,value in self.block_dictionary:
             if(value == True):
                 print("key",key)
-                print("names",names)
+                print("names",self.names)
                 print("blocker",key[0])
                 print("blocked",key[1])
                 #lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
