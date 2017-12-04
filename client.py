@@ -163,8 +163,9 @@ class Acceptor(Agent):
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
 
-        return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
-
+            return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
+        else:
+            return False
 
     def recvAcceptRequest(self,message):
         print("RECV ACCEPT REQUEST from",self.names[message.p])
