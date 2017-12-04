@@ -345,7 +345,6 @@ class Client:
 
     def blocks(self):
         print("printing block dictionary:")
-        print(self.block_dictionary)
         lines = []
         for key in self.block_dictionary:
             if(self.block_dictionary[key] == True):
