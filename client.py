@@ -347,13 +347,13 @@ class Client:
         print("printing block dictionary:")
         print(self.block_dictionary)
         lines = []
-        for key,value in self.block_dictionary:
+        for key1, key2, value in self.block_dictionary:
             if(value == True):
                 print("key",key)
                 print("names",self.names)
-                print("blocker",key[0])
-                print("blocked",key[1])
-                #lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
+                print("blocker",key1)
+                print("blocked",key2)
+                lines.append(self.names[key[0]]+" is blocking "+self.names[key[1]])
         return "\n".join(lines)
 
     def view_log(self):
