@@ -236,7 +236,7 @@ class Client:
                     commit = Commit(self.storage.event_list[message.i],message.i,self.id)
                     self.communicator.send_synod(commit,message.p)
 
-            elif(accept == True):#send Accepts back to the proposers.
+            else:#send Accepts back to the proposers.
                 self.communicator.send_synod(accept,message.p)
 
         elif(message.__class__.__name__ == "Accepted"):
