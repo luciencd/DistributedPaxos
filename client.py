@@ -295,8 +295,7 @@ class Client:
 
         #blocks and
         print("block?",message.v.op,(message.v.get_blocker(),message.v.get_blocked()))
-        if(message.v.op == "tweet"):
-            self.tweets_list.append()
+
         if(message.v.op == "block"):
             self.block_dictionary[(message.v.get_blocker(),message.v.get_blocked())] = True
         elif(message.v.op == "unblock"):
