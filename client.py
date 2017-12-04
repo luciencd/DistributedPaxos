@@ -47,8 +47,9 @@ class Proposer(Agent):
         max_proposal = -1
         max_value = None
         for key, value in counts.items():
-            if(key > max_proposal):
-                max_value = value[2]
+            if(key != None):
+                if(key > max_proposal):
+                    max_value = value[2]
 
         return max_value
     #message is a promise request.
