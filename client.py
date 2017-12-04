@@ -307,6 +307,7 @@ class Client:
 
         for i in range(len(storage.event_list)):
             e = storage.event_list[i]
+            print("recovering blocks")
             if(e.op == "block"):
                 self.block_dictionary[(e.get_blocker(),e.get_blocked())] = True
             elif(e.op == "unblock"):
@@ -341,6 +342,7 @@ class Client:
         return "\n".join(tweets_list_string)
 
     def blocks(self):
+        print("printing block dictionary:")
         print(self.block_dictionary)
         lines = []
         for key,value in self.block_dictionary:
@@ -363,8 +365,8 @@ class Client:
                     data = names[event.data.split(",")[0]]+" unblocks "+names[event.data.split(",")[1]]
                 else:
                     data = event.data
-                    
-                log_view.append(event.string3()+" "+data)
+
+                log_view.append(event.prefix()+" "+data)
 
         return "\n".join(log_view)
 
