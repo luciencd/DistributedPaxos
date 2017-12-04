@@ -54,7 +54,7 @@ class Proposer(Agent):
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
         #(self,index,p,n,value):
-        print("RECV PROMISE from",message.p)
+        print("RECV PROMISE from",self.names[message.p])
         value = message.v
 
         if(value == None):
@@ -80,7 +80,7 @@ class Proposer(Agent):
     def recvAccepted(self,message):
         #If failed to get majority or contradiction of consensus.
         #create new proposal
-        print("RECV ACCEPTED from",message.p)
+        print("RECV ACCEPTED from",self.names[message.p])
 
         self.storage.setAcceptancesReceived(message.i,message.p,message.n)
 
@@ -155,7 +155,7 @@ class Acceptor(Agent):
         super().__init__(id_,N,storage)
 
     def recvPrepare(self,message):
-        print("RECV PREPARE from",message.p)
+        print("RECV PREPARE from",self.names[message.p])
         #figure out what leader should send. if its 0, that's not gonna work right.
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             self.storage.setMinProposal(message.i,message.n)
@@ -164,7 +164,7 @@ class Acceptor(Agent):
 
 
     def recvAcceptRequest(self,message):
-        print("RECV ACCEPT REQUEST from",message.p)
+        print("RECV ACCEPT REQUEST from",self.names[message.p])
         if(message.n >= self.storage.min_proposal[message.i]):
             self.storage.setMinProposal(message.i,message.n)
             self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
@@ -236,7 +236,7 @@ class Client:
         elif(message.__class__.__name__ == "Commit"):
             commit_message = self.recvCommit(message)#if you are getting a commit message from someone, and you haven't already committed.
             #return false, if you have already committed.
-            print("RECEIVED COMMIT from",message.p)
+
             if(commit_message):#if you are told my someone else to commit.(might get more than one message here.)
                 self.commit(message)
                 self.storage.setRound(message.i+1)#don't want to try committing something when its gonna fail.
@@ -287,6 +287,7 @@ class Client:
 
     #accept commit message.
     def recvCommit(self,message):
+        print("RECEIVED COMMIT from",commit_message.p)
         return self.storage.event_list[message.i] == None
 
     def commit(self,message):

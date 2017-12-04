@@ -160,6 +160,8 @@ def main():
         else:
             print("Invalid operation.")
 
+        print()
+
     communicator.stop()
     Log.stop()
 
