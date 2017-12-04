@@ -305,14 +305,15 @@ class Client:
 
         #first, messages from static storage must be recreated.
         #self.storage.recover()
-
+        print("RECREATING DICTIONARY OF BLOCKS FROM DISK LOG.")
         for i in range(len(self.storage.event_list)):
             e = self.storage.event_list[i]
-            print("recovering blocks")
-            if(e.op == "block"):
-                self.block_dictionary[(e.get_blocker(),e.get_blocked())] = True
-            elif(e.op == "unblock"):
-                self.block_dictionary[(e.get_blocker(),e.get_blocked())] = False
+            if(e != None):
+
+                if(e.op == "block"):
+                    self.block_dictionary[(e.get_blocker(),e.get_blocked())] = True
+                elif(e.op == "unblock"):
+                    self.block_dictionary[(e.get_blocker(),e.get_blocked())] = False
 
         #contact learners to see what messages have not been received.
         print("FINISHED DICT BUILDING AND RECOVERY.")
