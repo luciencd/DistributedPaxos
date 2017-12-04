@@ -188,8 +188,8 @@ class Client:
         self.event_queue = []
 
         self.names = names#tells you the name of the processes, so you can print it out.
-        self.storage = storage
-        #self.crashRecover()##will try to recover the stable storage, and will start learning the new values it missed in the meantime.
+        self.storage = storage##will try to recover the stable storage, but not our responsibility
+        self.crashRecover()## will start learning the new values it missed in the meantime.
 
         self.block_dictionary = {}
 
@@ -303,7 +303,7 @@ class Client:
     def crashRecover(self):
 
         #first, messages from static storage must be recreated.
-        self.storage.recover()
+        #self.storage.recover()
 
         for i in range(len(storage.event_list)):
             e = storage.event_list[i]
