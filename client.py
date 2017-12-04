@@ -361,9 +361,9 @@ class Client:
             else:
                 data = ""
                 if(event.op == "block"):
-                    data = self.names[event.data.split(",")[0]]+" blocks "+self.names[event.data.split(",")[1]]
+                    data = self.names[int(event.data.split(",")[0])]+" blocks "+self.names[int(event.data.split(",")[1])]
                 elif(event.op == "unblock"):
-                    data = self.names[event.data.split(",")[0]]+" unblocks "+self.names[event.data.split(",")[1]]
+                    data = self.names[int(event.data.split(",")[0])]+" unblocks "+self.names[int(event.data.split(",")[1])]
                 else:
                     data = event.data
 
