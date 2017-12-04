@@ -189,9 +189,10 @@ class Client:
 
         self.names = names#tells you the name of the processes, so you can print it out.
         self.storage = storage##will try to recover the stable storage, but not our responsibility
+        self.block_dictionary = {}
         self.crashRecover()## will start learning the new values it missed in the meantime.
 
-        self.block_dictionary = {}
+
 
 
     #this has to be an anti-pattern
