@@ -2,7 +2,7 @@ import pickle
 import os
 
 class Storage:
-    def __init__(self, filename, N,maxindex=0,initStorage = 10):
+    def __init__(self, filename, N,maxindex=0,initStorage = 100):
         self.filename = filename
         self.maxindex = maxindex
         self.N = N

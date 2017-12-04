@@ -22,13 +22,16 @@ class Proposer(Agent):
 
     def getProposal(self):##should work.
         if(self.isLeader()):
-            return self.N
+            return -1
         else:
             return self.id
         #return int(str(self.storage.maxindex)+str(self.id))
 
-    def isLeader(self):
-        return self.leader
+    def isLeader(self,index):
+        if(self.storage.event_list[index].site == self.id):
+            return True
+        else:
+            return False
 
     #make sure the process whose chosen proposal matches his initial proposal becomes leader, and the converse for the others.
     def setLeader(self,leaderize=False):
@@ -241,12 +244,22 @@ class Client:
         print("twitter event()",new_event)
         if(self.storage.current_values[self.storage.maxindex] == None):
             print("twitter event() None if",new_event)
-            proposal = self.propose_event(new_event,self.storage.maxindex)
+            if(self.proposer.isLeader()):
+                acceptal = self.accept_event(new_event,self.storage.maxindex)
+            else:
+                proposal = self.propose_event(new_event,self.storage.maxindex)
             #print("PROPOSAL: ",proposal)
         else:
             self.storage.setRound(self.storage.maxindex+1)
             return False
 
+    def accept_event(self,new_event,index):
+        print("ACCEPTED EVENT AS LEADER")
+
+        #self.storage.setCurrentValue(index,new_event)
+        acc = AcceptRequest(self.getProposal(),self.storage.current_values[message.i],message.i,self.id)
+
+        self.communicator.acceptRequest(acc)
 
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
