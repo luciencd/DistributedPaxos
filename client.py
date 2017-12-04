@@ -28,7 +28,10 @@ class Proposer(Agent):
         #return int(str(self.storage.maxindex)+str(self.id))
 
     def isLeader(self,index):
-        if(self.storage.event_list[index].site == self.id):
+        if(self.storage.event_list[index-1] == None):
+            return False
+
+        if(self.storage.event_list[index-1].site == self.id):
             return True
         else:
             return False
