@@ -172,6 +172,7 @@ class Acceptor(Agent):
 
     def recvAcceptRequest(self,message):
         print("RECV ACCEPT REQUEST from",self.names[message.p])
+        print(message.n,"::",self.storage.min_proposal[message.i]))
         if(message.n >= self.storage.min_proposal[message.i]):
             self.storage.setMinProposal(message.i,message.n)
             self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
