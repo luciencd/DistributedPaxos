@@ -74,6 +74,8 @@ class Proposer(Agent):
             print(high_value)
             if(high_value != None):#what happens when you got any promise with a value.
                 self.storage.setCurrentValue(message.i,high_value)
+            else:
+                print("current value becasue all is none:",self.storage.current_values[message.i])
             #else, you just use your own value.
 
             #find the highest proposal number and create an acceptedRequest with it
