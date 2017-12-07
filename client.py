@@ -140,6 +140,7 @@ class Proposer(Agent):
         counts = self.getTotalCounts(index)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
+                print("quorum:",value[0])
                 if(key == None):
                     return self.getProposal(index)
                 else:
@@ -278,9 +279,10 @@ class Client:
                 proposal = self.propose_event(new_event,self.storage.maxindex)
             #print("PROPOSAL: ",proposal)
         else:
-            self.storage.setRound(self.storage.maxindex+1)
             return False
 
+        self.storage.setRound(self.storage.maxindex+1)
+        
     def accept_event(self,new_event,index):
         print("ACCEPTED EVENT AS LEADER")
 
@@ -290,7 +292,6 @@ class Client:
         accept = self.acceptor.recvAcceptRequest(acc)
         if(accept != False):
             self.proposer.recvAccepted(accept)
-
             #send accept request to all others.
         self.communicator.acceptRequest(acc)
 
