@@ -49,7 +49,7 @@ class Proposer(Agent):
         max_value = None
         for key, value in counts.items():
             if(key != None):
-                if(key != self.id)
+                if(key != self.id):
                     if(key > max_proposal):
                         max_value = value[2]
 
