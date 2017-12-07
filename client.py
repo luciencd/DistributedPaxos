@@ -313,11 +313,12 @@ class Client:
         print("PROPOSE EVENT")
         pro = Prepare(self.proposer.getProposal(index),index,self.id)
         #make sure to initially set the promise values and all that.
+        self.storage.setCurrentValue(index,new_event)
         print("NEW EVENT:",new_event)
         promise = self.acceptor.recvPrepare(pro)
         if(promise!=False):
             self.proposer.recvPromise(promise)
-        #self.storage.setCurrentValue(index,new_event)
+        #
         #-1 because the accNum is not set yet.
         #self.storage.setPromisesReceived(index,-1,self.proposer.getProposal(index),new_event)
         #figure out if this can be better abstracted though similar function to when you send it to a different
