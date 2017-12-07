@@ -1,2 +1,6 @@
 python main.py config.txt 9000
 python main.py config.txt 8923
+
+sudo apt-get update
+sudo apt-get -y install python3-pip
+pip3 install python-dateutil

@@ -129,7 +129,7 @@ class Proposer(Agent):
                     counts[promise_number] = (1,promise_number,promise_value)
             else:
                 if(None in counts):
-                    counts[None] = (counts[promise_number][0]+1,None,None)
+                    counts[None] = (counts[None][0]+1,None,None)
                 else:
                     counts[None] = (1,None,None)
         return counts
