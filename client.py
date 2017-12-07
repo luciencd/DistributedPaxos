@@ -172,6 +172,7 @@ class Acceptor(Agent):
             print("GETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
             self.storage.setMinProposal(message.i,message.n)
             print("SETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
+            print("CURRENT ACCEPTED VALUE:",self.storage.accepted_value[message.i])
 
             return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
         else:
