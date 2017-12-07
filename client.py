@@ -138,13 +138,16 @@ class Proposer(Agent):
 
     def isPromiseQuorum(self,index):
         counts = self.getTotalCounts(index)
+        print("counts:",counts)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
-                print("quorum:",value[0])
-                if(key == None):
-                    return self.getProposal(index)
-                else:
+
+                if(key != None):
+                    print("quorum:",value[0])
                     return value[1]
+                #    return self.getProposal(index)
+                #else:
+
             else:
                 pass
 
@@ -282,7 +285,7 @@ class Client:
             return False
 
         self.storage.setRound(self.storage.maxindex+1)
-        
+
     def accept_event(self,new_event,index):
         print("ACCEPTED EVENT AS LEADER")
 
