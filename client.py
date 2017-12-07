@@ -223,13 +223,16 @@ class Client:
 
                 #obviously send accept request to yourself when you do this.
                 accept = self.acceptor.recvAcceptRequest(accept_request)
-                self.proposer.recvAccepted(accept)
-                ##hope this always works.
-                #print("Current Accept Requests. should have [none, 1]",self.storage.acceptances_received)
-                #print("gonna send out accept request! for message value")
-                #print(accept_request)
-                #send accepts to all other processes but yourself.
-                self.communicator.broadcast_synod(accept_request)
+                if(accept == False):
+                    pass
+                else:
+                    self.proposer.recvAccepted(accept)
+                    ##hope this always works.
+                    #print("Current Accept Requests. should have [none, 1]",self.storage.acceptances_received)
+                    #print("gonna send out accept request! for message value")
+                    #print(accept_request)
+                    #send accepts to all other processes but yourself.
+                    self.communicator.broadcast_synod(accept_request)
         elif(message.__class__.__name__ == "AcceptRequest"):
             accept = self.acceptor.recvAcceptRequest(message)
             if(accept == False):#as in, you failed to send the right accept(could be you recovering.)
