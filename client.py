@@ -288,10 +288,13 @@ class Client:
         acc = AcceptRequest(self.proposer.getProposal(index),new_event,index,self.id)
         ##self accept request
         accept = self.acceptor.recvAcceptRequest(acc)
-        self.proposer.recvAccepted(accept)
+        if(accept != False):
+            self.proposer.recvAccepted(accept)
 
-        #send accept request to all others.
+            #send accept request to all others.
         self.communicator.acceptRequest(acc)
+
+
 
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
