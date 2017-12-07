@@ -140,9 +140,13 @@ class Proposer(Agent):
         counts = self.getTotalCounts(index)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
-                return value[1]
+                if(key == None):
+                    return self.getProposal(index)
+                else:
+                    return value[1]
             else:
                 pass
+
         return -1
 #learner is there to find out when a value has been chosen (by the acceptors)
 #and to broadcast that knowledge to all the proposers/clients,
