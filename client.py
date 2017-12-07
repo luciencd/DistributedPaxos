@@ -322,7 +322,7 @@ class Client:
         #client's acceptor.
 
         #print("proposing message sending")
-        self.communicator.propose(msg)
+        self.communicator.propose(pro)
         #print("proposed sent")
 
     #accept commit message.
