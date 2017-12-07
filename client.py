@@ -57,7 +57,7 @@ class Proposer(Agent):
     def recvPromise(self,message):
         #if setpromise breaks, return exception.
         #(self,index,p,n,value):
-        print("RECV PROMISE from",self.names[message.p])
+        print("RECV PROMISE from",self.names[message.p],"with ACC num",message.n)
         value = message.v
         print(value)
         if(value == None):
@@ -170,11 +170,13 @@ class Acceptor(Agent):
         #figure out what leader should send. if its 0, that's not gonna work right.
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
             print("GETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
+            min_proposal = self.storage.min_proposal[message.i]
             self.storage.setMinProposal(message.i,message.n)
             print("SETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
             print("CURRENT ACCEPTED VALUE:",self.storage.accepted_value[message.i])
+            print("CURRENT PROMISED VALUE:",self.storage.accepted_proposal[message.i])
 
-            return Promise(self.storage.min_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
+            return Promise(self.storage.accepted_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
         else:
             return False
 
