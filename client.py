@@ -59,7 +59,7 @@ class Proposer(Agent):
         #(self,index,p,n,value):
         print("RECV PROMISE from",self.names[message.p])
         value = message.v
-
+        print(value)
         if(value == None):
             value = self.storage.current_values[message.i]
             #print("value at index",message.i,value)
@@ -69,8 +69,9 @@ class Proposer(Agent):
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
         if(self.isPromiseQuorum(message.i)>=0):
-            high_value = self.highest_value_of_proposals(message.i)
 
+            high_value = self.highest_value_of_proposals(message.i)
+            print(high_value)
             if(high_value != None):#what happens when you got any promise with a value.
                 self.storage.setCurrentValue(message.i,high_value)
             #else, you just use your own value.
@@ -247,7 +248,7 @@ class Client:
                 if(self.storage.event_list[message.i] != None):
                     commit = Commit(self.storage.event_list[message.i],message.i,self.id)
                     self.communicator.send_synod(commit,message.p)
-                
+
             else:#send Accepts back to the proposers.
                 self.communicator.send_synod(accept,message.p)
 
