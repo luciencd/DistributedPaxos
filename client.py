@@ -265,7 +265,7 @@ class Client:
 
             if(commit_message):#if you are told my someone else to commit.(might get more than one message here.)
                 self.commit(message)
-                self.storage.setRound(message.i+1)#don't want to try committing something when its gonna fail.
+                #don't want to try committing something when its gonna fail.
 
 
 
@@ -321,6 +321,8 @@ class Client:
 
     def commit(self,message):
         print("COMMIT")
+        if(self.storage.event_list[message.i] == None):
+            self.storage.setRound(message.i+1)
         self.storage.commitEvent(message.i,message.v)
 
         #blocks and
