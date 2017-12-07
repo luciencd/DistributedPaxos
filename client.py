@@ -94,7 +94,7 @@ class Proposer(Agent):
         self.storage.setAcceptancesReceived(message.i,message.p,message.n)
 
         if(self.isAcceptedQuorum(message.i)):
-            print("MESSAGE COMMITTING:",message.v,type(message.v))
+            #print("MESSAGE COMMITTING:",message.v,type(message.v))
             #print("MESSAGE dict",message.v.op)
             #When the Proposal gets N/2 + 1 Acceptances.
 
@@ -142,12 +142,12 @@ class Proposer(Agent):
 
     def isPromiseQuorum(self,index):
         counts = self.getTotalCounts(index)
-        print("counts:",counts)
+        #print("counts:",counts)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
 
                 if(key != None):
-                    print("quorum:",value[0],value[1],"<--")
+                    #print("quorum:",value[0],value[1],"<--")
                     return value[1]
                 #    return self.getProposal(index)
                 #else:
@@ -172,12 +172,12 @@ class Acceptor(Agent):
         print("RECV PREPARE from",self.names[message.p])
         #figure out what leader should send. if its 0, that's not gonna work right.
         if(message.n > self.storage.min_proposal[message.i]):#along with leader election and no 0 process but the leader.
-            print("GETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
+            #print("GETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
             min_proposal = self.storage.min_proposal[message.i]
             self.storage.setMinProposal(message.i,message.n)
-            print("SETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
-            print("CURRENT ACCEPTED VALUE:",self.storage.accepted_value[message.i])
-            print("CURRENT PROMISED VALUE:",self.storage.accepted_proposal[message.i])
+            #print("SETTING MIN PROPOSAL:",self.storage.min_proposal[message.i])
+            #print("CURRENT ACCEPTED VALUE:",self.storage.accepted_value[message.i])
+            #print("CURRENT PROMISED VALUE:",self.storage.accepted_proposal[message.i])
 
             return Promise(self.storage.accepted_proposal[message.i],self.storage.accepted_value[message.i],message.i,self.id)
         else:
@@ -185,7 +185,7 @@ class Acceptor(Agent):
 
     def recvAcceptRequest(self,message):
         print("RECV ACCEPT REQUEST from",self.names[message.p])
-        print(message.n,"::",self.storage.min_proposal[message.i])
+        #print(message.n,"::",self.storage.min_proposal[message.i])
         if(message.n >= self.storage.min_proposal[message.i]):
             self.storage.setMinProposal(message.i,message.n)
             self.storage.setAcceptedProposal(message.i,self.storage.min_proposal[message.i])
@@ -315,7 +315,7 @@ class Client:
         pro = Prepare(self.proposer.getProposal(index),index,self.id)
         #make sure to initially set the promise values and all that.
         self.storage.setCurrentValue(index,new_event)
-        print("NEW EVENT:",new_event)
+        #print("NEW EVENT:",new_event)
         promise = self.acceptor.recvPrepare(pro)
         if(promise!=False):
             self.proposer.recvPromise(promise)
@@ -331,7 +331,7 @@ class Client:
 
     #accept commit message.
     def recvCommit(self,message):
-        print("RECEIVED COMMIT from",message.p)
+        #print("RECEIVED COMMIT from",message.p)
         return self.storage.event_list[message.i] == None
 
     def commit(self,message):
