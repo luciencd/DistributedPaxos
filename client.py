@@ -69,10 +69,12 @@ class Proposer(Agent):
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
         if(self.isPromiseQuorum(message.i)>=0):
-            #counts = self.getTotalCounts(index)
             high_value = self.highest_value_of_proposals(message.i)
-            #print("high value is ",high_value)
-            self.storage.setCurrentValue(message.i,high_value)
+
+            if(high_value != None):#what happens when you got any promise with a value.
+                self.storage.setCurrentValue(message.i,high_value)
+            #else, you just use your own value.
+
             #find the highest proposal number and create an acceptedRequest with it
             acc = AcceptRequest(self.getProposal(message.i),self.storage.current_values[message.i],message.i,self.id)#or new message.
             #print(acc)
@@ -138,9 +140,11 @@ class Proposer(Agent):
         counts = self.getTotalCounts(index)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
-                if(value == None):
-                    value = self.current_values[index][self.id]
+                if(value[2] == None):
+                    value[2] = self.current_values[index][self.id]
                     print("NO PROMISE VALUES RECEIVED.")
+                    return self.getProposal()
+
                 print("QUROUM reached! with accept proposal",value[1],"tweet",value[2].data)
                 return value[1]
             else:
