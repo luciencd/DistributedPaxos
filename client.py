@@ -209,9 +209,10 @@ class Client:
         if(message.__class__.__name__ == "Prepare"):##proposal messages are interpreted by the proposal.
             promise = self.acceptor.recvPrepare(message)
             if(promise == False):
-                if(self.storage.event_list[message.i] != None):
-                    commit = Commit(self.storage.event_list[message.i],message.i,self.id)
-                    self.communicator.send_synod(commit,message.p)
+                pass
+                #if(self.storage.event_list[message.i] != None):
+                #    commit = Commit(self.storage.event_list[message.i],message.i,self.id)
+                #    self.communicator.send_synod(commit,message.p)
             else:
                 self.communicator.send_synod(promise,message.p)
 
@@ -235,10 +236,10 @@ class Client:
                 #didn't accept value
 
                 #if the value has been chosen though, send it back!! #this is some pseudo learner stuff here.
-                if(self.storage.event_list[message.i] != None):
-                    commit = Commit(self.storage.event_list[message.i],message.i,self.id)
-                    self.communicator.send_synod(commit,message.p)
-
+                #if(self.storage.event_list[message.i] != None):
+                #    commit = Commit(self.storage.event_list[message.i],message.i,self.id)
+                #    self.communicator.send_synod(commit,message.p)
+                pass
             else:#send Accepts back to the proposers.
                 self.communicator.send_synod(accept,message.p)
 
