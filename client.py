@@ -68,7 +68,7 @@ class Proposer(Agent):
 
         self.storage.setPromisesReceived(message.i,message.p,message.n,value)
 
-        if(self.isPromiseQuorum(message.i)>=0):
+        if(self.isPromiseQuorum(message.i)>=-1):
 
             high_value = self.highest_value_of_proposals(message.i)
             print(high_value)
@@ -152,7 +152,7 @@ class Proposer(Agent):
             else:
                 pass
 
-        return -1
+        return -2
 #learner is there to find out when a value has been chosen (by the acceptors)
 #and to broadcast that knowledge to all the proposers/clients,
 #so that they do not have to keep sending proposals for no reason
