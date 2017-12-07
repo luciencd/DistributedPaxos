@@ -309,15 +309,15 @@ class Client:
     #when you tweet for the first tme
     def propose_event(self,new_event,index):
         print("PROPOSE EVENT")
-        n = self.proposer.getProposal(index)
-        msg = Prepare(n,index,self.id)
-
-        #print("setting self value")
+        pro = Prepare(self.proposer.getProposal(index),index,self.id)
         #make sure to initially set the promise values and all that.
         print("NEW EVENT:",new_event)
-        self.storage.setCurrentValue(index,new_event)
+        promise = self.acceptor.recvPrepare(pro)
+        if(promise!=False):
+            self.proposer.recvPromise(promise)
+        #self.storage.setCurrentValue(index,new_event)
         #-1 because the accNum is not set yet.
-        self.storage.setPromisesReceived(index,-1,self.proposer.getProposal(index),new_event)
+        #self.storage.setPromisesReceived(index,-1,self.proposer.getProposal(index),new_event)
         #figure out if this can be better abstracted though similar function to when you send it to a different
         #client's acceptor.
 
