@@ -140,17 +140,9 @@ class Proposer(Agent):
         counts = self.getTotalCounts(index)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
-                if(value[2] == None):
-                    value[2] = self.current_values[index][self.id]
-                    print("NO PROMISE VALUES RECEIVED.")
-                    return self.getProposal()
-
-                print("QUROUM reached! with accept proposal",value[1],"tweet",value[2].data)
                 return value[1]
             else:
-                #print("not a quorum for proposal",value[1])
                 pass
-
         return -1
 #learner is there to find out when a value has been chosen (by the acceptors)
 #and to broadcast that knowledge to all the proposers/clients,
