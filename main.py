@@ -156,6 +156,10 @@ def main():
         elif user_option == "erase":
             print("Erasing all data (must do on all nodes!!!)")
             client.erase()
+        elif user_option == "index":
+
+            print("Current MaxIndex:",str(client.storage.maxindex))
+
 
         elif user_option =="quit":
             print("Shutting down...")
