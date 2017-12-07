@@ -252,7 +252,7 @@ class Client:
             if(commit_bool):#if you have a perfect accept quorum (1ce for all indices)
                 self.commit(message)
                 #only after you yourself are committing, not getting a commit from somewhere else.
-                self.storage.setRound(self.storage.maxindex+1)
+                #self.storage.setRound(self.storage.maxindex+1)
 
                 #send commit message to others.
                 commit_message = Commit(message.v,message.i,message.p)
@@ -321,9 +321,10 @@ class Client:
 
     def commit(self,message):
         print("COMMIT")
-        if(self.storage.event_list[message.i] == None):
-            self.storage.setRound(message.i+1)
+
         self.storage.commitEvent(message.i,message.v)
+        #if(self.storage.event_list[message.i] == None):
+        self.storage.setRound(message.i+1)
 
         #blocks and
         print("block?",message.v.op,(message.v.get_blocker(),message.v.get_blocked()))
