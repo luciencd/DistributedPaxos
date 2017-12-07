@@ -147,7 +147,7 @@ class Proposer(Agent):
             if(value[0] == self.numProcesses()//2 + 1):
 
                 if(key != None):
-                    print("quorum:",value[0],value[1]"<--")
+                    print("quorum:",value[0],value[1],"<--")
                     return value[1]
                 #    return self.getProposal(index)
                 #else:
