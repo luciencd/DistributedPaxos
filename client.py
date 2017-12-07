@@ -138,7 +138,10 @@ class Proposer(Agent):
         counts = self.getTotalCounts(index)
         for key, value in counts.items():
             if(value[0] == self.numProcesses()//2 + 1):
-                print("QUROUM reached! accept proposal",value[1],"tweet",value[2].data)
+                if(value == None):
+                    value = self.current_values[index][self.id]
+                    print("NO PROMISE VALUES RECEIVED.")
+                print("QUROUM reached! with accept proposal",value[1],"tweet",value[2].data)
                 return value[1]
             else:
                 #print("not a quorum for proposal",value[1])
