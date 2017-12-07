@@ -49,8 +49,9 @@ class Proposer(Agent):
         max_value = None
         for key, value in counts.items():
             if(key != None):
-                if(key > max_proposal):
-                    max_value = value[2]
+                if(key != self.id)
+                    if(key > max_proposal):
+                        max_value = value[2]
 
         return max_value
     #message is a promise request.
@@ -146,7 +147,7 @@ class Proposer(Agent):
             if(value[0] == self.numProcesses()//2 + 1):
 
                 if(key != None):
-                    print("quorum:",value[0])
+                    print("quorum:",value[0],value[1]"<--")
                     return value[1]
                 #    return self.getProposal(index)
                 #else:
